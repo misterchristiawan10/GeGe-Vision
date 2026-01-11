@@ -1,39 +1,39 @@
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { UserProfile, ModuleId } from './types';
-import { LoginScreen } from './components/LoginScreen';
-import { Layout } from './components/Layout';
-import { WelcomeMessage } from './components/WelcomeMessage';
-import { CopyrightGuard } from './components/CopyrightGuard';
-import { ComplianceGuard } from './components/ComplianceGuard';
-import { ApiSettingsModal } from './components/ApiSettingsModal';
-import { setGlobalApiKeys } from './services/geminiService';
+import { UserProfile, ModuleId } from './types.ts';
+import { LoginScreen } from './components/LoginScreen.tsx';
+import { Layout } from './components/Layout.tsx';
+import { WelcomeMessage } from './components/WelcomeMessage.tsx';
+import { CopyrightGuard } from './components/CopyrightGuard.tsx';
+import { ComplianceGuard } from './components/ComplianceGuard.tsx';
+import { ApiSettingsModal } from './components/ApiSettingsModal.tsx';
+import { setGlobalApiKeys } from './services/geminiService.ts';
 
 // Import modules
-import { HomeModule as Home } from './components/modules/Home';
-import { VirtualPhotoshootModule } from './components/modules/VirtualPhotoshoot';
-import { PrewedVirtualModule } from './components/modules/PrewedVirtual';
-import { ContentCreatorModule } from './components/modules/ContentCreator';
-import { CosplayFusionModule } from './components/modules/CosplayFusion';
-import { BikiniPhotoshootModule } from './components/modules/BikiniPhotoshoot';
-import { PinstaProductModule } from './components/modules/PinstaProduct';
-import { KarikaturModule } from './components/modules/Karikatur';
-import { InfografisModule } from './components/modules/Infografis';
-import { SmartPandaStudioModule as NusantaraStudioModule } from './components/modules/NusantaraStudio';
-import { VidGenModule } from './components/modules/VidGen';
-import { StoryBoardModule } from './components/modules/StoryBoard';
-import { VoiceOverStudioModule } from './components/modules/VoiceOverStudio';
-import { RebelFXModule } from './components/modules/RebelFX';
-import { GlobalHistoryModule } from './components/modules/GlobalHistory';
-import { Mp4ToMp3Module } from './components/modules/Mp4ToMp3';
-import { ThumbnailMakerModule } from './components/modules/ThumbnailMaker';
-import { AsmrVisualMakerModule } from './components/modules/AsmrVisualMaker';
-import { ImageResizerModule } from './components/modules/ImageResizer';
-import { RenovationTimelapseModule } from './components/modules/RenovationTimelapse';
-import { WorldTourModule } from './components/modules/WorldTour';
-import { AdminPanelModule } from './components/modules/AdminPanel';
+import { HomeModule as Home } from './components/modules/Home.tsx';
+import { VirtualPhotoshootModule } from './components/modules/VirtualPhotoshoot.tsx';
+import { PrewedVirtualModule } from './components/modules/PrewedVirtual.tsx';
+import { ContentCreatorModule } from './components/modules/ContentCreator.tsx';
+import { CosplayFusionModule } from './components/modules/CosplayFusion.tsx';
+import { BikiniPhotoshootModule } from './components/modules/BikiniPhotoshoot.tsx';
+import { PinstaProductModule } from './components/modules/PinstaProduct.tsx';
+import { KarikaturModule } from './components/modules/Karikatur.tsx';
+import { InfografisModule } from './components/modules/Infografis.tsx';
+import { SmartPandaStudioModule as NusantaraStudioModule } from './components/modules/NusantaraStudio.tsx';
+import { VidGenModule } from './components/modules/VidGen.tsx';
+import { StoryBoardModule } from './components/modules/StoryBoard.tsx';
+import { VoiceOverStudioModule } from './components/modules/VoiceOverStudio.tsx';
+import { RebelFXModule } from './components/modules/RebelFX.tsx';
+import { GlobalHistoryModule } from './components/modules/GlobalHistory.tsx';
+import { Mp4ToMp3Module } from './components/modules/Mp4ToMp3.tsx';
+import { ThumbnailMakerModule } from './components/modules/ThumbnailMaker.tsx';
+import { AsmrVisualMakerModule } from './components/modules/AsmrVisualMaker.tsx';
+import { ImageResizerModule } from './components/modules/ImageResizer.tsx';
+import { RenovationTimelapseModule } from './components/modules/RenovationTimelapse.tsx';
+import { WorldTourModule } from './components/modules/WorldTour.tsx';
+import { AdminPanelModule } from './components/modules/AdminPanel.tsx';
 
-import { loadState, saveState } from './services/storageService';
+import { loadState, saveState } from './services/storageService.ts';
 
 const App: React.FC = () => {
   const [user, setUser] = useState<UserProfile | null>(null);
