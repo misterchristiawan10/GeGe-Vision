@@ -1,6 +1,5 @@
-
 import React, { useState, useEffect } from 'react';
-import { X, ShieldCheck, Zap, Info, Key, CheckCircle, RefreshCw, LogOut, Check } from 'lucide-react';
+import { X, ShieldCheck, Zap, Info, Key, CheckCircle, RefreshCw, LogOut, Check, AlertTriangle } from 'lucide-react';
 
 interface ApiSettingsModalProps {
   isOpen: boolean;
@@ -13,7 +12,7 @@ interface ApiSettingsModalProps {
 export const ApiSettingsModal: React.FC<ApiSettingsModalProps> = ({ isOpen, onClose, onLogout, onSave, initialKeys }) => {
   const [keys, setKeys] = useState<string[]>(['', '', '']);
   const [activeToggles, setActiveToggles] = useState<boolean[]>([true, false, false]);
-  const [isValidating, setIsValidating] = useState(false);
+  const [errors, setErrors] = useState<string[]>(['', '', '']);
   const [showSaved, setShowSaved] = useState(false);
 
   useEffect(() => {
@@ -37,6 +36,12 @@ export const ApiSettingsModal: React.FC<ApiSettingsModalProps> = ({ isOpen, onCl
     const newToggles = [...activeToggles];
     newToggles[index] = !newToggles[index];
     setActiveToggles(newToggles);
+    
+    // Clear error for this index when toggling
+    const newErrors = [...errors];
+    newErrors[index] = '';
+    setErrors(newErrors);
+
     if (!newToggles[index]) {
         const newKeys = [...keys];
         newKeys[index] = '';
@@ -48,14 +53,45 @@ export const ApiSettingsModal: React.FC<ApiSettingsModalProps> = ({ isOpen, onCl
     const newKeys = [...keys];
     newKeys[index] = val;
     setKeys(newKeys);
+
+    // Clear error for this index as user types
+    if (errors[index]) {
+      const newErrors = [...errors];
+      newErrors[index] = '';
+      setErrors(newErrors);
+    }
+
     if (val.trim() !== '') {
         const newToggles = [...activeToggles];
-        newToggles[index] = true;
-        setActiveToggles(newToggles);
+        if (!newToggles[index]) {
+          newToggles[index] = true;
+          setActiveToggles(newToggles);
+        }
     }
   };
 
   const handleSave = () => {
+    const newErrors = ['', '', ''];
+    let hasError = false;
+
+    activeToggles.forEach((isActive, i) => {
+      if (isActive) {
+        const keyVal = keys[i].trim();
+        if (!keyVal) {
+          newErrors[i] = 'API Key tidak boleh kosong.';
+          hasError = true;
+        } else if (keyVal.length < 30) {
+          newErrors[i] = 'API Key terlalu pendek (Min. 30 karakter).';
+          hasError = true;
+        }
+      }
+    });
+
+    if (hasError) {
+      setErrors(newErrors);
+      return;
+    }
+
     onSave(keys.filter((_, i) => activeToggles[i]));
     setShowSaved(true);
     setTimeout(() => {
@@ -117,8 +153,13 @@ export const ApiSettingsModal: React.FC<ApiSettingsModalProps> = ({ isOpen, onCl
                         disabled={!activeToggles[idx]}
                         onChange={(e) => handleKeyChange(idx, e.target.value)}
                         placeholder={activeToggles[idx] ? "Masukkan Kunci API Gemini Anda..." : "Kunci Dinonaktifkan"}
-                        className="w-full bg-black/50 border border-white/10 rounded-xl py-3 px-4 text-xs font-mono text-violet-400 focus:outline-none focus:border-violet-500/50 transition-all placeholder:text-gray-700"
+                        className={`w-full bg-black/50 border rounded-xl py-3 px-4 text-xs font-mono transition-all placeholder:text-gray-700 focus:outline-none ${errors[idx] ? 'border-red-500 text-red-400' : 'border-white/10 text-violet-400 focus:border-violet-500/50'}`}
                       />
+                      {errors[idx] && (
+                        <p className="text-[10px] text-red-500 mt-2 font-bold flex items-center gap-1 animate-fade-in">
+                          <AlertTriangle size={10} /> {errors[idx]}
+                        </p>
+                      )}
                    </div>
                 </div>
               ))}
