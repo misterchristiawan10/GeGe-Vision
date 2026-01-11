@@ -11,6 +11,21 @@ interface WorldTourProps {
 
 // Data Destinasi
 const DESTINATIONS: Record<string, Record<string, string[]>> = {
+  "Indonesia 🇮🇩": {
+    "Bali": ["Pura Lempuyang (Gates of Heaven)", "Uluwatu Temple (Cliff)", "Tegalalang Rice Terrace", "Kelingking Beach Nusa Penida", "Pura Ulun Danu Bratan"],
+    "Jakarta": ["Monas (Monumen Nasional)", "Bundaran HI (Skyline)", "Kota Tua Jakarta", "Gelora Bung Karno Stadium"],
+    "Yogyakarta": ["Candi Borobudur", "Candi Prambanan", "Jalan Malioboro", "Taman Sari Water Castle", "Pantai Parangtritis"],
+    "Surakarta (Solo)": ["Keraton Surakarta Hadiningrat", "Pura Mangkunegaran", "Pasar Gede Hardjonagoro", "Museum Batik Danar Hadi", "Kampoeng Batik Laweyan"],
+    "Gunung & Alam": ["Gunung Bromo (Lautan Pasir)", "Gunung Rinjani (Puncak & Segara Anak)", "Gunung Ijen (Blue Fire)", "Gunung Merapi (Lava Tour)", "Gunung Kelimutu (Danau Tiga Warna)", "Gunung Semeru (Oro-oro Ombo)"],
+    "Bandung": ["Gedung Sate", "Jalan Braga (Classic)", "Kawah Putih Ciwidey", "Tangkuban Perahu", "Lembang Highland View"],
+    "Surabaya": ["Jembatan Suramadu", "Tugu Pahlawan", "Monumen Kapal Selam", "Patung Suro dan Boyo"],
+    "Medan": ["Istana Maimun", "Masjid Raya Al-Mashun", "Danau Toba (Samosir View)", "Graha Maria Annai Velangkanni"],
+    "Makassar": ["Pantai Losari (Sunset)", "Benteng Rotterdam", "Masjid 99 Kubah", "Pulau Samalona"],
+    "Lombok": ["Sirkuit Internasional Mandalika", "Bukit Merese", "Gili Trawangan", "Desa Adat Sade"],
+    "Labuan Bajo": ["Pulau Padar (Top View)", "Pink Beach", "Pulau Komodo", "Gua Rangko (Glowing Water)"],
+    "Palembang": ["Jembatan Ampera (Malam)", "Benteng Kuto Besak", "Pulau Kemaro"],
+    "Raja Ampat": ["Wayag Islands (Karst View)", "Piaynemo Overlook", "Pasir Timbul Beach"]
+  },
   "Jepang 🇯🇵": {
     "Tokyo": ["Tokyo Tower (Red Steel)", "Shibuya Crossing (Crowded)", "Senso-ji Temple (Asakusa)", "Shinjuku Neon Street"],
     "Kyoto": ["Fushimi Inari Taisha (Torii Gates)", "Arashiyama Bamboo Grove", "Kinkaku-ji (Golden Pavilion)"],
@@ -43,11 +58,6 @@ const DESTINATIONS: Record<string, Record<string, string[]>> = {
     "Madinah": ["Masjid Nabawi (Green Dome)", "Payung Raksasa Nabawi"],
     "Al Ula": ["Elephant Rock", "Hegra (Mada'in Saleh)"]
   },
-  "Indonesia 🇮🇩": {
-    "Bali": ["Pura Lempuyang (Gates of Heaven)", "Uluwatu Temple (Cliff)", "Tegalalang Rice Terrace", "Kelingking Beach Nusa Penida"],
-    "Jakarta": ["Monas (Monumen Nasional)", "Bundaran HI"],
-    "Yogyakarta": ["Candi Borobudur", "Jalan Malioboro"]
-  },
   "Turki 🇹🇷": {
     "Istanbul": ["Hagia Sophia", "Blue Mosque", "Galata Tower"],
     "Cappadocia": ["Hot Air Balloons (Sunrise)", "Fairy Chimneys"]
@@ -68,12 +78,13 @@ const TIMES = [
 const SEASONS = [
   'Musim Semi (Bunga Mekar)', 
   'Musim Panas (Cerah)', 
-  'Musim Gugur (Daun Oranye)', 
+  'Musim Gugur (Dan Oranye)', 
   'Musim Dingin (Salju)',
   'Hujan Romantis'
 ];
 
 const DESTINATION_OUTFITS: Record<string, string[]> = {
+  "Indonesia 🇮🇩": ["Kebaya Modern & Kain Batik", "Pakaian Adat Bali Lengkap", "Batik Formal Executive", "Tenun Ikat NTT Style", "Streetwear Urban Indonesia", "Kaos Santai Tropis"],
   "Jepang 🇯🇵": ["Kimono Tradisional (Full Set)", "Yukata (Summer Festival)", "Seragam Sekolah Jepang (Seifuku)", "Harajuku Street Style"],
   "Perancis 🇫🇷": ["Parisian Chic (Beret & Trench Coat)", "Haute Couture Elegant Dress", "Striped Shirt & Red Scarf"],
   "Amerika Serikat 🇺🇸": ["NYC Urban Streetwear", "Coachella Boho Style", "Ivy League Preppy", "Hollywood Red Carpet Gown"],
@@ -81,7 +92,6 @@ const DESTINATION_OUTFITS: Record<string, string[]> = {
   "Inggris 🇬🇧": ["Classic Trench Coat & Umbrella", "Royal Ascott Style", "Vintage Tweed Jacket", "Mod Fashion 60s"],
   "Korea Selatan 🇰🇷": ["Hanbok Tradisional Premium", "K-Drama Chaebol Style", "K-Pop Idol Stage Outfit", "Korean Street Fashion"],
   "Arab Saudi 🇸🇦": ["Abaya Glamour (Wanita)", "Thobe & Bisht (Pria)", "Modest Fashion Luxury", "Desert Safari Chic"],
-  "Indonesia 🇮🇩": ["Kebaya Modern & Kain Batik", "Pakaian Adat Bali Lengkap", "Batik Formal Executive", "Tenun Ikat NTT Style"],
   "Turki 🇹🇷": ["Ottoman Kaftan Royal", "Cappadocia Travel Dress (Flowy)", "Turkish Silk Scarf Style"],
   "Swiss 🇨🇭": ["Luxury Winter Ski Suit", "Traditional Swiss Dirndl/Tracht", "Cozy Cashmere Winter Wear"]
 };
@@ -137,17 +147,16 @@ const SHOT_TYPES = [
 ];
 
 export const WorldTourModule: React.FC<WorldTourProps> = ({ initialState, onStateChange }) => {
-  const [country, setCountry] = useState(Object.keys(DESTINATIONS)[0]);
-  const [city, setCity] = useState(Object.keys(DESTINATIONS[Object.keys(DESTINATIONS)[0]])[0]);
-  const [landmark, setLandmark] = useState(DESTINATIONS[Object.keys(DESTINATIONS)[0]][Object.keys(DESTINATIONS[Object.keys(DESTINATIONS)[0]])[0]][0]);
+  const [country, setCountry] = useState('Indonesia 🇮🇩');
+  const [city, setCity] = useState('Bali');
+  const [landmark, setLandmark] = useState('Pura Lempuyang (Gates of Heaven)');
   
   const [time, setTime] = useState(TIMES[1].id);
   const [season, setSeason] = useState(SEASONS[1]);
   const [outfit, setOutfit] = useState('Pakai Baju Asli (Jangan Ubah)');
   const [style, setStyle] = useState(STYLES[0]);
-  const [shotType, setShotType] = useState(SHOT_TYPES[2]); // Default Waist Up
+  const [shotType, setShotType] = useState(SHOT_TYPES[2]);
 
-  // Handlers untuk update state secara sinkron untuk mencegah glitch UI
   const handleCountryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newCountry = e.target.value;
     const newCities = Object.keys(DESTINATIONS[newCountry]);
@@ -157,7 +166,7 @@ export const WorldTourModule: React.FC<WorldTourProps> = ({ initialState, onStat
     setCountry(newCountry);
     setCity(newCity);
     setLandmark(newLandmark);
-    setOutfit('Pakai Baju Asli (Jangan Ubah)'); // Reset outfit to default when country changes
+    setOutfit('Pakai Baju Asli (Jangan Ubah)');
   };
 
   const handleCityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -173,11 +182,9 @@ export const WorldTourModule: React.FC<WorldTourProps> = ({ initialState, onStat
   };
 
   const handleSeasonChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const newSeason = e.target.value;
-    setSeason(newSeason);
+    setSeason(e.target.value);
   };
 
-  // Build the list of outfit options dynamically
   const destinationSpecificOutfits = DESTINATION_OUTFITS[country] || [];
   const seasonalOutfits = OUTFIT_RECOMMENDATIONS[season] || [];
   
@@ -187,7 +194,6 @@ export const WorldTourModule: React.FC<WorldTourProps> = ({ initialState, onStat
     ...seasonalOutfits
   ];
 
-  // State Management for Parent
   useEffect(() => {
     onStateChange?.({
         settings: { country, city, landmark, time, season, outfit, style, shotType },
@@ -195,17 +201,14 @@ export const WorldTourModule: React.FC<WorldTourProps> = ({ initialState, onStat
     });
   }, [country, city, landmark, time, season, outfit, style, shotType]);
 
-  // Load Initial State
   useEffect(() => {
     if (initialState?.settings) {
         const savedCountry = initialState.settings.country;
         if (savedCountry && DESTINATIONS[savedCountry]) {
             setCountry(savedCountry);
-            // Validasi city
             const savedCity = initialState.settings.city;
             if (savedCity && DESTINATIONS[savedCountry][savedCity]) {
                 setCity(savedCity);
-                // Validasi landmark
                 const savedLandmark = initialState.settings.landmark;
                 if (savedLandmark && DESTINATIONS[savedCountry][savedCity].includes(savedLandmark)) {
                     setLandmark(savedLandmark);
@@ -261,7 +264,7 @@ export const WorldTourModule: React.FC<WorldTourProps> = ({ initialState, onStat
       **Additional User Instruction:** ${prompt}
     `;
 
-    return await generateCreativeImage(fullPrompt, baseImage, aspectRatio, imageSize, null, null, true); // preserveFace = true
+    return await generateCreativeImage(fullPrompt, baseImage, aspectRatio, imageSize, null, null, true); 
   };
 
   const extraControls = (
@@ -286,7 +289,7 @@ export const WorldTourModule: React.FC<WorldTourProps> = ({ initialState, onStat
 
             <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1">
-                    <label className="text-[10px] font-bold text-gray-500 uppercase">Kota</label>
+                    <label className="text-[10px] font-bold text-gray-500 uppercase">Kota / Area</label>
                     <select 
                         value={city} 
                         onChange={handleCityChange}
@@ -343,12 +346,6 @@ export const WorldTourModule: React.FC<WorldTourProps> = ({ initialState, onStat
                         onChange={(e) => setOutfit(e.target.value)}
                         className="w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-transparent p-2 text-xs dark:text-white"
                     >
-                        {/* 
-                            Dynamic Option Generation 
-                            1. Keep Original
-                            2. Destination Specific (Kimono for Japan, etc)
-                            3. Seasonal Generic
-                        */}
                         {currentOutfitOptions.map(o => (
                             <option key={o} value={o}>{o}</option>
                         ))}
