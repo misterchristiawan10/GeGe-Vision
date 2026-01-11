@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { generateCreativeImage, generateInfographicPrompt, generateRandomPrompt, refineUserPrompt, analyzeImagePrompt, generateSocialCaption } from '../../services/geminiService';
+import { generateCreativeImage, generateInfographicPrompt, generateRandomPrompt, refineUserPrompt, analyzeImagePrompt, generateSocialCaption } from '../services/geminiService';
 import { ModuleId } from '../types';
 import { ErrorPopup } from './ErrorPopup';
 import { ZoomIn, X, Download, RotateCcw, RotateCw, History, Image as ImageIcon } from 'lucide-react';
@@ -83,7 +83,7 @@ export const GeneratorModule: React.FC<GeneratorModuleProps> = (props) => {
     } = props;
 
   const [image, setImage] = useState<File | null>(null);
-  const [refImage, setRefImage] = useState<File | null>(initialRefImage);
+  const [refImage, setRefImage] = useState<File | null>(initialRefImage || null);
   const [faceImage2, setFaceImage2] = useState<File | null>(null);
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const [viewImage, setViewImage] = useState<string | null>(null);
