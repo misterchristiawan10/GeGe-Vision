@@ -45,7 +45,7 @@ export const ErrorPopup: React.FC<ErrorPopupProps> = ({ message, onClose, onRetr
                 <p className="text-[10px] font-bold text-amber-700 dark:text-amber-400 uppercase mb-1">Tips Solusi:</p>
                 <ul className="text-[10px] text-amber-600 dark:text-amber-500 list-disc ml-4 space-y-1">
                   <li>Tunggu 1-5 menit lalu coba lagi.</li>
-                  <li>Tambah API Key baru di menu <b>Settings > API Vault</b>.</li>
+                  <li>Tambah API Key baru di menu <b>Settings {" > "} API Vault</b>.</li>
                   <li>Pastikan kunci Anda aktif (Tanda centang hijau).</li>
                 </ul>
               </div>
