@@ -104,9 +104,9 @@ export const Layout: React.FC<LayoutProps> = ({ children, activeModuleId, onNavi
   };
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row bg-gray-50 dark:bg-dark-bg transition-colors duration-300">
+    <div className="min-h-screen flex flex-col md:flex-row bg-gray-50 dark:bg-dark-bg transition-colors duration-300 overflow-x-hidden">
       
-      {/* Modals remain the same */}
+      {/* About Modal */}
       <Modal isOpen={activeModal === 'about'} onClose={() => setActiveModal(null)} title="THE CORE VISION: SCALING FUTURE">
         <div className="space-y-8 py-2">
           <div className="text-center space-y-3">
@@ -116,10 +116,149 @@ export const Layout: React.FC<LayoutProps> = ({ children, activeModuleId, onNavi
              <h2 className="text-3xl font-black tracking-tight text-gray-900 dark:text-white uppercase">Apa itu GeGe Vision?</h2>
              <p className="text-xs font-bold text-gray-500 dark:text-gray-400">The Ultimate Creative OS for Digital Visionaries</p>
           </div>
-          <div className="space-y-8 text-center">
-             <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
-                <span className="font-black text-indigo-600">GeGe Vision</span> adalah ekosistem AI terpadu untuk para kreator masa depan.
+
+          <div className="space-y-8">
+             <div className="p-8 rounded-[2.5rem] bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/5 text-center shadow-inner">
+                <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+                   <span className="font-black text-indigo-600">GeGe Vision</span> bukan sekadar aplikasi AI biasa. Kami adalah ekosistem terpadu yang dirancang untuk menjadi "Brain Extension" bagi para kreator, desainer, dan pebisnis digital. Dengan engine <b>Prism v1.2.0</b>, kami menyatukan kekuatan generative AI tingkat tinggi ke dalam alur kerja yang intuitif dan <i>hassle-free</i>.
+                </p>
+             </div>
+
+             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="p-6 rounded-[2rem] bg-amber-50 dark:bg-amber-900/10 border border-amber-100 dark:border-amber-900/20 space-y-3 hover:scale-105 transition-transform">
+                   <div className="text-amber-600 dark:text-amber-400 font-black text-xs uppercase tracking-widest">GOLD</div>
+                   <p className="text-xs font-medium leading-relaxed">Kualitas premium tanpa kompromi. Setiap piksel dan bit audio diproses untuk hasil standar industri.</p>
+                </div>
+                <div className="p-6 rounded-[2rem] bg-blue-50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-900/20 space-y-3 hover:scale-105 transition-transform">
+                   <div className="text-blue-600 dark:text-blue-400 font-black text-xs uppercase tracking-widest">GOSPEL</div>
+                   <p className="text-xs font-medium leading-relaxed">Integritas data adalah harga mati. Privasi pengguna dan kedaulatan digital adalah fondasi kami.</p>
+                </div>
+                <div className="p-6 rounded-[2rem] bg-violet-50 dark:bg-violet-900/10 border border-violet-100 dark:border-violet-900/20 space-y-3 hover:scale-105 transition-transform">
+                   <div className="text-violet-600 dark:text-violet-400 font-black text-xs uppercase tracking-widest">GEGE</div>
+                   <p className="text-xs font-medium leading-relaxed">Winning energy. Kami memberikan <i>leverage</i> tak terbatas agar karya Anda selalu jadi "Final Boss" di market.</p>
+                </div>
+             </div>
+
+             <div className="bg-slate-950 rounded-[2.5rem] p-8 text-white overflow-hidden relative shadow-2xl">
+                <div className="absolute -right-10 -bottom-10 opacity-5 group-hover:opacity-10 transition-opacity">
+                   <Code2 size={200} />
+                </div>
+                <h4 className="font-bold text-base mb-6 flex items-center gap-3">
+                   <SparklesIcon size={20} className="text-yellow-400" /> Technology Stack
+                </h4>
+                <div className="flex flex-wrap gap-2">
+                   {['GOOGLE GEMINI 3', 'VEO 3.1', 'PRISM ENGINE', 'EDGE COMPUTE', 'LOCAL-FIRST DB'].map(tech => (
+                      <span key={tech} className="px-4 py-2 bg-white/10 rounded-xl text-[10px] font-black uppercase tracking-widest border border-white/5 hover:bg-white/20 transition-colors">{tech}</span>
+                   ))}
+                </div>
+                <p className="text-[10px] mt-8 opacity-60 italic font-medium">Handcrafted with precision by GeGe Creative Studio.</p>
+             </div>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Privacy Modal */}
+      <Modal isOpen={activeModal === 'privacy'} onClose={() => setActiveModal(null)} title="DIGITAL SOVEREIGNTY & GEGE VAULT">
+        <div className="space-y-8 py-2">
+          <div className="text-center space-y-2">
+             <div className="w-20 h-20 bg-violet-500/10 rounded-[2rem] flex items-center justify-center text-violet-500 mx-auto border border-violet-500/20 shadow-inner">
+                <Lock size={40} />
+             </div>
+             <h2 className="text-3xl font-black tracking-tight text-gray-900 dark:text-white">Privasi Anda Adalah Prioritas Gold Kami</h2>
+             <p className="text-xs font-bold text-gray-500 dark:text-gray-400">Versi 1.2.0 • Protokol Keamanan Ephemeral Aktif</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+             <div className="p-6 rounded-[2.5rem] bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/5 space-y-4 hover:shadow-lg transition-all">
+                <div className="flex items-center gap-3 text-violet-500 font-black text-xs uppercase tracking-widest">
+                   <Zap size={18} /> EPHEMERAL PROCESSING
+                </div>
+                <p className="text-xs leading-relaxed text-gray-600 dark:text-gray-400">Setiap piksel yang Anda unggah diproses secara <b>real-time</b> melalui Google Gemini API tingkat tinggi. GeGe Vision tidak menyimpan salinan data mentah Anda di server pusat kami. Begitu sesi selesai, data menghilang bagai debu digital.</p>
+             </div>
+
+             <div className="p-6 rounded-[2.5rem] bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/5 space-y-4 hover:shadow-lg transition-all">
+                <div className="flex items-center gap-3 text-indigo-500 font-black text-xs uppercase tracking-widest">
+                   <Database size={18} /> LOCAL-FIRST MEMORY
+                </div>
+                <p className="text-xs leading-relaxed text-gray-600 dark:text-gray-400">Kami menggunakan teknologi <b>IndexedDB</b> (penyimpanan lokal peramban) untuk menyimpan riwayat kreasi Anda. Artinya, aset berharga Anda tetap berada di perangkat Anda, bukan di tangan pihak ketiga. Anda pegang kendali penuh.</p>
+             </div>
+
+             <div className="p-6 rounded-[2.5rem] bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/5 space-y-4 hover:shadow-lg transition-all">
+                <div className="flex items-center gap-3 text-emerald-500 font-black text-xs uppercase tracking-widest">
+                   <EyeOff size={18} /> ZERO TRACKING POLICY
+                </div>
+                <p className="text-xs leading-relaxed text-gray-600 dark:text-gray-400">GeGe Vision bebas dari iklan yang mengganggu dan pelacak perilaku (trackers). Kami tidak menjual data kebiasaan kreatif Anda kepada broker data. Kami di sini untuk akselerasi karya, bukan eksploitasi data.</p>
+             </div>
+
+             <div className="p-6 rounded-[2.5rem] bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/5 space-y-4 hover:shadow-lg transition-all">
+                <div className="flex items-center gap-3 text-rose-500 font-black text-xs uppercase tracking-widest">
+                   <Shield size={18} /> ENTERPRISE GRADE ENCRYPTION
+                </div>
+                <p className="text-xs leading-relaxed text-gray-600 dark:text-gray-400">Semua komunikasi antara browser Anda dan mesin AI kami dilindungi oleh enkripsi <b>TLS 1.3</b>. Koneksi aman, ide aman, hasil pun aman. Tidak ada celah untuk penyadapan data visual Anda.</p>
+             </div>
+          </div>
+
+          <div className="p-8 rounded-[2.5rem] bg-indigo-950 text-white space-y-6 shadow-2xl relative overflow-hidden">
+             <div className="absolute top-0 right-0 p-4 opacity-10">
+               <ShieldCheck size={100} />
+             </div>
+             <h4 className="font-bold text-base flex items-center gap-3">
+                <CheckCircle2 size={24} className="text-emerald-400" /> Komitmen GeGe Vision
+             </h4>
+             <p className="text-xs opacity-90 leading-relaxed italic font-serif">
+                "Kami percaya bahwa kreativitas tanpa privasi adalah kerentanan. Di GeGe Vision, kami membangun benteng digital supaya imajinasi Anda bisa terbang bebas tanpa rasa takut diawasi. Gold untuk kualitas, Gospel untuk integritas, dan GeGe untuk kemenangan karya Anda."
              </p>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Contact Modal */}
+      <Modal isOpen={activeModal === 'contact'} onClose={() => setActiveModal(null)} title="CONNECT WITH CREATIVE HQ">
+        <div className="space-y-8 py-2">
+          <div className="text-center space-y-3">
+             <div className="w-20 h-20 bg-indigo-500/10 rounded-full flex items-center justify-center text-indigo-500 mx-auto border border-indigo-500/20 shadow-inner">
+                <MessageCircle size={40} />
+             </div>
+             <h2 className="text-2xl font-black tracking-tight text-gray-900 dark:text-white uppercase italic">Let's Sync Your Vision!</h2>
+             <p className="text-xs text-gray-500 dark:text-gray-400 max-w-sm mx-auto leading-relaxed">
+                Punya ide gila, butuh support teknis, atau mau kolaborasi bisnis? Tim spesialis AI kami siap bantu <b>gaspol</b> progres Anda.
+             </p>
+          </div>
+
+          <div className="grid grid-cols-1 gap-4">
+             <a href="mailto:support@gegevision.com" className="flex items-center gap-6 p-6 bg-white dark:bg-white/5 border border-gray-100 dark:border-white/5 rounded-[2rem] hover:border-indigo-500 transition-all group shadow-sm">
+                <div className="w-14 h-14 rounded-2xl bg-indigo-600 text-white flex items-center justify-center group-hover:scale-110 group-hover:rotate-3 transition-transform shadow-lg shadow-indigo-500/20">
+                   <Mail size={24}/>
+                </div>
+                <div className="flex-1">
+                   <p className="text-[10px] font-black text-indigo-500 uppercase tracking-widest mb-1">Official Inquiry</p>
+                   <p className="text-sm font-black text-gray-900 dark:text-white group-hover:text-indigo-500 transition-colors">support@gegevision.com</p>
+                   <p className="text-[10px] text-gray-400 mt-1">Response time: &lt; 24 jam</p>
+                </div>
+                <Zap size={20} className="text-gray-300 group-hover:text-yellow-500 transition-colors" />
+             </a>
+
+             <div className="flex items-center gap-6 p-6 bg-white dark:bg-white/5 border border-gray-100 dark:border-white/5 rounded-[2rem] group shadow-sm">
+                <div className="w-14 h-14 rounded-2xl bg-violet-600 text-white flex items-center justify-center shadow-lg shadow-violet-500/20">
+                   <Briefcase size={24}/>
+                </div>
+                <div className="flex-1">
+                   <p className="text-[10px] font-black text-violet-500 uppercase tracking-widest mb-1">Partnerships</p>
+                   <p className="text-sm font-black text-gray-900 dark:text-white">business@gegevision.com</p>
+                   <p className="text-[10px] text-gray-400 mt-1">Scale your project with our AI Engine.</p>
+                </div>
+             </div>
+
+             <div className="grid grid-cols-2 gap-4">
+                <a href="#" className="flex flex-col items-center gap-4 p-6 bg-white dark:bg-white/5 border border-gray-100 dark:border-white/5 rounded-[2rem] hover:border-pink-500 transition-all group text-center">
+                   <Instagram size={32} className="text-pink-500 group-hover:scale-125 transition-transform" />
+                   <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest group-hover:text-pink-500">Instagram</span>
+                </a>
+                <a href="#" className="flex flex-col items-center gap-4 p-6 bg-white dark:bg-white/5 border border-gray-100 dark:border-white/5 rounded-[2rem] hover:border-emerald-500 transition-all group text-center">
+                   <Globe size={32} className="text-emerald-500 group-hover:scale-125 transition-transform" />
+                   <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest group-hover:text-emerald-500">Community HQ</span>
+                </a>
+             </div>
           </div>
         </div>
       </Modal>
@@ -140,7 +279,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, activeModuleId, onNavi
             <button onClick={() => setIsMobileMenuOpen(false)} className="lg:hidden p-2 text-gray-400"><X size={20}/></button>
           </div>
 
-          <nav className="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar">
+          <nav className="flex-1 overflow-y-auto p-4 space-y-6 custom-scrollbar">
             {/* Theme Toggle Button */}
             <button 
                 onClick={onToggleTheme}
@@ -169,7 +308,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, activeModuleId, onNavi
                 </div>
                 <div className="text-left">
                     <p className="text-[10px] font-black uppercase tracking-widest leading-none mb-1">API Vault Settings</p>
-                    <p className="text-[9px] opacity-70">Kelola API Key Anda</p>
+                    <p className="text-[9px] opacity-70">Kelola 3 API Key Anda</p>
                 </div>
             </button>
 
@@ -228,7 +367,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, activeModuleId, onNavi
         </div>
       </aside>
 
-      <main className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden">
+      <main className="flex-1 flex flex-col min-w-0 min-h-screen overflow-x-hidden">
         <header className="lg:hidden bg-white dark:bg-dark-card border-b border-gray-200 dark:border-gray-800 p-4 flex items-center justify-between sticky top-0 z-40">
            <button onClick={() => setIsMobileMenuOpen(true)} className="p-2 -ml-2 text-gray-500 dark:text-gray-400"><Menu size={24} /></button>
            <div className="font-black text-violet-600 flex items-center gap-2 dark:text-violet-400">
@@ -247,6 +386,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, activeModuleId, onNavi
           <footer className="bg-white dark:bg-dark-card border-t border-gray-100 dark:border-gray-800 py-12 px-8 mt-auto">
             <div className="max-w-7xl mx-auto">
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
+                    {/* Column 1: App Info */}
                     <div className="space-y-6">
                         <div className="flex items-center gap-4">
                             <GeGePrismLogo size="sm" />
@@ -263,6 +403,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, activeModuleId, onNavi
                         </div>
                     </div>
 
+                    {/* Column 2: Layanan */}
                     <div className="flex flex-col">
                         <h4 className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] mb-6">LAYANAN</h4>
                         <ul className="space-y-3">
@@ -272,6 +413,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, activeModuleId, onNavi
                         </ul>
                     </div>
 
+                    {/* Column 3: Legal & Support */}
                     <div className="flex flex-col">
                         <h4 className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] mb-6">LEGAL & SUPPORT</h4>
                         <ul className="space-y-3">
@@ -281,10 +423,19 @@ export const Layout: React.FC<LayoutProps> = ({ children, activeModuleId, onNavi
                         </ul>
                     </div>
 
+                    {/* Column 4: Credits & Social Icons */}
                     <div className="md:text-right space-y-6">
                         <div className="space-y-1">
                             <p className="text-xs font-bold text-gray-900 dark:text-white">Dibuat dengan ❤️ oleh <span className="font-black text-violet-600">GeGe Teams.</span></p>
                             <p className="text-[10px] text-gray-400">© 2025 GeGe Vision. All rights reserved.</p>
+                        </div>
+                        <div className="flex md:justify-end gap-3 pt-4">
+                            <button onClick={() => setActiveModal('privacy')} className="p-2 bg-gray-50 dark:bg-gray-800 rounded-full text-gray-400 hover:text-violet-500 transition-all border border-gray-100 dark:border-gray-700 shadow-sm">
+                                <ShieldCheck size={18} />
+                            </button>
+                            <button onClick={() => setActiveModal('about')} className="p-2 bg-gray-50 dark:bg-gray-800 rounded-full text-gray-400 hover:text-violet-500 transition-all border border-gray-100 dark:border-gray-700 shadow-sm">
+                                <Info size={18} />
+                            </button>
                         </div>
                     </div>
                 </div>
