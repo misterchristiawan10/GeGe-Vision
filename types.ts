@@ -22,9 +22,10 @@ export type ModuleId =
   | 'image-resizer'
   | 'renovation-timelapse'
   | 'world-tour'
-  | 'global-history'
   | 'family-fusion'
-  | 'admin-panel'; // Modul baru
+  | 'admin-panel'
+  | 'settings'
+  | 'global-history'; // @google/genai-api:fix - Added missing global-history ID
 
 export interface ModuleDefinition {
   id: ModuleId;
@@ -32,14 +33,29 @@ export interface ModuleDefinition {
   description: string;
   icon: React.ElementType;
   gradient: string;
-  adminOnly?: boolean; // Flag untuk modul khusus admin
+  adminOnly?: boolean;
+}
+
+export interface UserApiKey {
+  id: string;
+  label: string;
+  key: string;
+  isActive: boolean;
+}
+
+export interface Draft {
+  id: string;
+  title: string;
+  module: string;
+  content: string;
+  timestamp: number;
 }
 
 export interface UserProfile {
   name: string;
   email: string;
   avatar: string;
-  role: 'admin' | 'user'; // Role baru
+  role: 'admin' | 'user';
 }
 
 export interface GenerationConfig {

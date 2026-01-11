@@ -1,6 +1,7 @@
+
 import React, { useState, useEffect, useRef } from 'react';
-// @google/genai-api:fix - Add 'Settings' to lucide-react imports.
-import { Copy, RefreshCw, Sparkles, Zap, Layout, Palette, Image as ImageIcon, Monitor, ChevronDown, Check, Wand2, CloudRain, MapPin, Loader2, CloudLightning, Sun, Cloud, ArrowRight, Type, PenTool, Calendar, Users, Target, Search, List, Download, ImageIcon as PhotoIcon, Gauge, X, ZoomIn, BarChart3, RotateCcw, RotateCw, Settings } from 'lucide-react';
+// @google/genai-api:fix - Add 'Settings' to lucide-react imports. Fixed duplicate ImageIcon names.
+import { Copy, RefreshCw, Sparkles, Zap, Layout, Palette, Image as UIImage, Monitor, ChevronDown, Check, Wand2, CloudRain, MapPin, Loader2, CloudLightning, Sun, Cloud, ArrowRight, Type, PenTool, Calendar, Users, Target, Search, List, Download, ImageIcon, Gauge, X, ZoomIn, BarChart3, RotateCcw, RotateCw, Settings } from 'lucide-react';
 import { generateCreativeImage, refineUserPrompt } from '../../services/geminiService';
 import { ErrorPopup } from '../ErrorPopup';
 
@@ -365,7 +366,7 @@ export const InfografisModule: React.FC<InfografisProps> = ({ initialState, onSt
     } else if (promptFormat === 'dalle') {
         base = `Create a high quality infographic. ${topicDescription} ${layoutDetails} ${styleDetails} ${colorDetails} ${manualInjection}`;
     } else {
-        base = `**Subject:** ${topic || (isWeatherMode ? selectedCity : 'Topic')}\n**Description:** ${topicDescription}\n**Format:** ${selectedType.label} (${isWeatherMode ? 'Map' : selectedType.details})\n**Style:** ${selectedStyle.label}\n**Visual Keywords:** ${selectedStyle.keyword}\n**Color Scheme:** ${selectedPalette.label} (${selectedPalette.keyword})\n**Typography:** ${selectedFont.label}\n**Target:** ${selectedTarget.label}\n**Aspect Ratio:** ${aspectRatio.label}\n**Custom Instructions:** ${manualPrompt || 'None'}\n\n**Detailed Directive:**\nPlease generate a highly detailed and data-rich visualization. The layout should strictly follow the logic of a ${isWeatherMode ? 'Meteorological Map' : selectedType.label}. Use the specified art style to create a unique aesthetic. Ensure the background provides good contrast for the data elements.`;
+        base = `**Subject:** ${topic || (isWeatherMode ? selectedCity : 'Topic')}\n**Description:** ${topicDescription}\n**Format:** ${selectedType.label} (${isWeatherMode ? 'Map' : selectedType.details})\n**Style:** ${selectedStyle.label}\n**Visual Keywords:** ${selectedStyle.keyword}\n**Color Scheme:** ${selectedPalette.label} (\${selectedPalette.keyword})\n**Typography:** ${selectedFont.label}\n**Target:** ${selectedTarget.label}\n**Aspect Ratio:** ${aspectRatio.label}\n**Custom Instructions:** ${manualPrompt || 'None'}\n\n**Detailed Directive:**\nPlease generate a highly detailed and data-rich visualization. The layout should strictly follow the logic of a ${isWeatherMode ? 'Meteorological Map' : selectedType.label}. Use the specified art style to create a unique aesthetic. Ensure the background provides good contrast for the data elements.`;
     }
 
     setGeneratedPrompt(base);
@@ -613,7 +614,6 @@ export const InfografisModule: React.FC<InfografisProps> = ({ initialState, onSt
 
           <section className={`p-6 rounded-2xl shadow-sm border transition-all duration-300 space-y-6 ${cardBg} ${cardBorder}`}>
              <div className="flex items-center gap-2 font-bold text-gray-800 dark:text-white border-b pb-3">
-                {/* @google/genai-api:fix - Use imported icon 'Settings' from lucide-react. */}
                 <Settings size={20} className="text-indigo-500" />
                 <span>Pengaturan Lanjutan</span>
              </div>

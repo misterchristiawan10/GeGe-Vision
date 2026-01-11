@@ -6,7 +6,7 @@ import { Layout } from './components/Layout';
 import { WelcomeMessage } from './components/WelcomeMessage';
 import { CopyrightGuard } from './components/CopyrightGuard';
 import { ComplianceGuard } from './components/ComplianceGuard';
-import { ApiSettingsModal } from './components/ApiSettingsModal';
+// @google/genai-api:fix - Removed redundant ApiSettingsModal, unified into SettingsModule
 import { setGlobalApiKeys } from './services/geminiService';
 
 // Import modules
@@ -32,6 +32,7 @@ import { ImageResizerModule } from './components/modules/ImageResizer';
 import { RenovationTimelapseModule } from './components/modules/RenovationTimelapse';
 import { WorldTourModule } from './components/modules/WorldTour';
 import { AdminPanelModule } from './components/modules/AdminPanel';
+import { SettingsModule } from './components/modules/Settings';
 
 import { loadState, saveState } from './services/storageService';
 
@@ -42,10 +43,8 @@ const App: React.FC = () => {
   const [isWelcomeOpen, setIsWelcomeOpen] = useState(false);
   const [isCopyrightOpen, setIsCopyrightOpen] = useState(false);
   const [isComplianceOpen, setIsComplianceOpen] = useState(false);
-  const [isApiModalOpen, setIsApiModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
-  const [apiKeys, setApiKeys] = useState<string[]>([]);
   const [theme, setTheme] = useState<Theme>('light');
   
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -80,15 +79,22 @@ const App: React.FC = () => {
       const copyrightAccepted = await loadState('copyrightAccepted');
       const complianceAccepted = await loadState('complianceAccepted');
       const lastActiveId = await loadState('lastActiveModuleId');
-      const savedKeys = await loadState('apiKeys');
+      
+      // Load API settings for global service
+      const storedApiVault = localStorage.getItem('gege_api_vault');
+      if (storedApiVault) {
+          try {
+              const parsed = JSON.parse(storedApiVault);
+              if (parsed.keys && parsed.activeToggles) {
+                  const validKeys = parsed.keys.filter((k: string, i: number) => parsed.activeToggles[i] && k.trim().length >= 30);
+                  setGlobalApiKeys(validKeys);
+              }
+          } catch(e) {}
+      }
 
       if (savedUser) setUser(savedUser);
       if (savedState) setModulesState(savedState);
       if (lastActiveId) setActiveModuleId(lastActiveId);
-      if (savedKeys) {
-          setApiKeys(savedKeys);
-          setGlobalApiKeys(savedKeys);
-      }
       
       if (!copyrightAccepted) {
         setIsCopyrightOpen(true);
@@ -119,12 +125,6 @@ const App: React.FC = () => {
       return newState;
     });
   }, []);
-
-  const handleSaveApiKeys = async (keys: string[]) => {
-    setApiKeys(keys);
-    setGlobalApiKeys(keys);
-    await saveState('apiKeys', keys);
-  };
 
   const handleLogin = async (profile: UserProfile) => {
     setUser(profile);
@@ -169,20 +169,12 @@ const App: React.FC = () => {
       activeModuleId={activeModuleId} 
       onNavigate={handleNavigate} 
       isSaving={isSaving}
-      onOpenApiSettings={() => setIsApiModalOpen(true)}
+      onOpenApiSettings={() => handleNavigate('settings')} // Direct to settings module
       theme={theme}
       onToggleTheme={toggleTheme}
     >
       <WelcomeMessage isOpen={isWelcomeOpen} onClose={() => { setIsWelcomeOpen(false); saveState('welcomeShown', true); }} />
       
-      <ApiSettingsModal 
-        isOpen={isApiModalOpen}
-        onClose={() => setIsApiModalOpen(false)}
-        onLogout={handleLogout}
-        onSave={handleSaveApiKeys}
-        initialKeys={apiKeys}
-      />
-
       <div style={{ display: activeModuleId === 'home' ? 'block' : 'none' }}>
         <Home onNavigate={handleNavigate} />
         {user.role === 'admin' && (
@@ -198,6 +190,10 @@ const App: React.FC = () => {
 
       <div style={{ display: activeModuleId === 'admin-panel' ? 'block' : 'none' }}>
         <AdminPanelModule />
+      </div>
+
+      <div style={{ display: activeModuleId === 'settings' ? 'block' : 'none' }}>
+        <SettingsModule onNavigate={handleNavigate} />
       </div>
 
       <div style={{ display: activeModuleId === 'virtual-photoshoot' ? 'block' : 'none' }}><VirtualPhotoshootModule initialState={modulesState['virtual-photoshoot']} onStateChange={(s) => handleModuleStateChange('virtual-photoshoot', s)}/></div>
