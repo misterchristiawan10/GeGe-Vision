@@ -180,7 +180,7 @@ export const generateRenovationStory = async (o: string, c: string, l: string, r
   return await callWithRetry(async (ai) => {
     const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
-      contents: `Direct architectural timelapse for ${o}, from ${c} in ${l} to ${r} in ${s} steps. JSON output.`,
+      contents: `Generate a professional architectural renovation plan for a ${o} located in ${l}. Start from a ${c} state and end with a ${r} transformation. Provide ${s} logical steps. **CRITICAL:** Every scene description must maintain a FIXED stationary camera position (locked tripod) from the exact same viewpoint. Describe specific architectural details, lighting shifts, and construction materials for each frame. Output as JSON with 'firstFramePrompt' and an array of 'timelapseSteps'.`,
       config: { 
           responseMimeType: 'application/json',
           responseSchema: {
