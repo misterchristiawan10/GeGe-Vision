@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, ShieldCheck, Zap, Info, Key, CheckCircle, RefreshCw, LogOut, Check, AlertTriangle } from 'lucide-react';
+import { X, ShieldCheck, Zap, Info, Key, CheckCircle, RefreshCw, LogOut, Check, AlertTriangle, Cpu } from 'lucide-react';
 
 interface ApiSettingsModalProps {
   isOpen: boolean;
@@ -12,13 +12,25 @@ interface ApiSettingsModalProps {
 export const ApiSettingsModal: React.FC<ApiSettingsModalProps> = ({ isOpen, onClose, onLogout, onSave, initialKeys }) => {
   const [keys, setKeys] = useState<string[]>(['', '', '']);
   const [activeToggles, setActiveToggles] = useState<boolean[]>([true, false, false]);
+  const [useSystemKey, setUseSystemKey] = useState<boolean>(true);
   const [errors, setErrors] = useState<string[]>(['', '', '']);
   const [showSaved, setShowSaved] = useState(false);
 
+  // Load from localStorage on mount
   useEffect(() => {
-    if (initialKeys && initialKeys.length > 0) {
-      const newKeys = [...keys];
-      const newToggles = [...activeToggles];
+    const savedSettings = localStorage.getItem('gege_api_vault');
+    if (savedSettings) {
+      try {
+        const parsed = JSON.parse(savedSettings);
+        if (parsed.keys) setKeys(parsed.keys);
+        if (parsed.activeToggles) setActiveToggles(parsed.activeToggles);
+        if (parsed.useSystemKey !== undefined) setUseSystemKey(parsed.useSystemKey);
+      } catch (e) {
+        console.error("Failed to parse saved API settings from localStorage", e);
+      }
+    } else if (initialKeys && initialKeys.length > 0) {
+      const newKeys = ['', '', ''];
+      const newToggles = [false, false, false];
       initialKeys.forEach((k, i) => {
         if (i < 3) {
             newKeys[i] = k;
@@ -28,7 +40,7 @@ export const ApiSettingsModal: React.FC<ApiSettingsModalProps> = ({ isOpen, onCl
       setKeys(newKeys);
       setActiveToggles(newToggles);
     }
-  }, [initialKeys]);
+  }, [isOpen]); // Reload when modal opens to ensure sync
 
   if (!isOpen) return null;
 
@@ -92,13 +104,28 @@ export const ApiSettingsModal: React.FC<ApiSettingsModalProps> = ({ isOpen, onCl
       return;
     }
 
-    onSave(keys.filter((_, i) => activeToggles[i]));
+    // Persist to localStorage
+    const settingsToSave = {
+        keys,
+        activeToggles,
+        useSystemKey
+    };
+    localStorage.setItem('gege_api_vault', JSON.stringify(settingsToSave));
+
+    // Send only valid active user keys to the app state
+    // Note: System key usage is handled by logic in geminiService fallback or explicit flags
+    const validUserKeys = keys.filter((_, i) => activeToggles[i] && keys[i].trim().length >= 30);
+    onSave(validUserKeys);
+    
     setShowSaved(true);
     setTimeout(() => {
         setShowSaved(false);
         onClose();
     }, 1000);
   };
+
+  // Check if no keys are available at all
+  const noActiveKeys = !useSystemKey && !activeToggles.some((isActive, i) => isActive && keys[i].trim().length >= 30);
 
   return (
     <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4 md:p-6 animate-fade-in backdrop-blur-sm bg-black/60">
@@ -122,6 +149,20 @@ export const ApiSettingsModal: React.FC<ApiSettingsModalProps> = ({ isOpen, onCl
 
         {/* Content */}
         <div className="p-6 space-y-6 flex-1 overflow-y-auto custom-scrollbar">
+           
+           {/* Critical Warning if No Keys Active */}
+           {noActiveKeys && (
+             <div className="p-4 bg-red-900/20 border border-red-500/50 rounded-2xl flex gap-3 animate-shake">
+                <AlertTriangle size={20} className="text-red-500 flex-shrink-0" />
+                <div className="space-y-1">
+                   <p className="text-xs font-black text-red-400 uppercase tracking-tight">Koneksi AI Terputus!</p>
+                   <p className="text-[10px] text-red-300/80 leading-relaxed">
+                      Opsi Kunci Sistem dimatikan dan tidak ada Kunci User yang aktif. Aplikasi tidak akan bisa menghasilkan konten. Silakan aktifkan Kunci Sistem atau masukkan Kunci API Gemini Anda sendiri.
+                   </p>
+                </div>
+             </div>
+           )}
+
            <div className="p-4 bg-violet-900/10 border border-violet-500/20 rounded-2xl flex gap-3">
               <Info size={18} className="text-violet-500 flex-shrink-0 mt-0.5" />
               <p className="text-[10px] text-violet-300 leading-relaxed uppercase font-bold tracking-wider">
@@ -130,13 +171,40 @@ export const ApiSettingsModal: React.FC<ApiSettingsModalProps> = ({ isOpen, onCl
            </div>
 
            <div className="space-y-4">
+              {/* Default System Key Option */}
+              <div className={`p-5 rounded-2xl border transition-all ${useSystemKey ? 'bg-indigo-900/20 border-indigo-500/40' : 'bg-slate-950 border-white/5 opacity-60'}`}>
+                   <div className="flex justify-between items-center">
+                      <div className="flex items-center gap-3">
+                        <div className={`p-2 rounded-lg ${useSystemKey ? 'bg-indigo-500 text-white' : 'bg-slate-800 text-gray-600'}`}>
+                           <Cpu size={16} />
+                        </div>
+                        <div>
+                           <p className={`text-[10px] font-black uppercase tracking-widest ${useSystemKey ? 'text-white' : 'text-gray-500'}`}>Kunci Sistem GeGe (Default)</p>
+                           <p className="text-[9px] text-gray-500">Gunakan API Key bawaan sistem (Terbatas kuota bersama).</p>
+                        </div>
+                      </div>
+                      <button 
+                        onClick={() => setUseSystemKey(!useSystemKey)}
+                        className={`w-10 h-5 rounded-full relative transition-colors ${useSystemKey ? 'bg-indigo-500' : 'bg-slate-800'}`}
+                      >
+                         <div className={`absolute top-1 left-1 w-3 h-3 bg-white rounded-full transition-transform ${useSystemKey ? 'translate-x-5' : ''}`}></div>
+                      </button>
+                   </div>
+              </div>
+
+              <div className="flex items-center gap-2 px-2">
+                 <div className="h-px flex-1 bg-white/5"></div>
+                 <span className="text-[9px] font-black text-gray-600 uppercase tracking-[0.3em]">Kunci Pribadi</span>
+                 <div className="h-px flex-1 bg-white/5"></div>
+              </div>
+
               {[0, 1, 2].map((idx) => (
                 <div key={idx} className={`p-5 rounded-2xl border transition-all ${activeToggles[idx] ? 'bg-slate-900 border-violet-500/30' : 'bg-slate-950 border-white/5 opacity-60'}`}>
                    <div className="flex justify-between items-center mb-4">
                       <div className="flex items-center gap-2">
                         <Key size={14} className={activeToggles[idx] ? 'text-violet-500' : 'text-gray-600'} />
                         <span className={`text-[10px] font-black uppercase tracking-widest ${activeToggles[idx] ? 'text-white' : 'text-gray-500'}`}>
-                           API Gemini #{idx + 1} {idx === 0 ? '(Bawaan)' : ''}
+                           API Gemini User #{idx + 1}
                         </span>
                       </div>
                       <button 
