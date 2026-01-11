@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 import { UserProfile, ModuleId } from './types';
 import { LoginScreen } from './components/LoginScreen';
 import { Layout } from './components/Layout';
@@ -192,6 +193,7 @@ const App: React.FC = () => {
       <div style={{ display: activeModuleId === 'renovation-timelapse' ? 'block' : 'none' }}><RenovationTimelapseModule initialState={modulesState['renovation-timelapse']} onStateChange={(s) => handleModuleStateChange('renovation-timelapse', s)}/></div>
       <div style={{ display: activeModuleId === 'global-history' ? 'block' : 'none' }}><GlobalHistoryModule modulesState={modulesState} onNavigate={handleNavigate} onDelete={(m, i) => { }}/></div>
     </Layout>
+    <SpeedInsights />
   );
 };
 
