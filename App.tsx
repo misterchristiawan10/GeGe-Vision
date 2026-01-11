@@ -6,7 +6,8 @@ import { Layout } from './components/Layout';
 import { WelcomeMessage } from './components/WelcomeMessage';
 import { CopyrightGuard } from './components/CopyrightGuard';
 import { ComplianceGuard } from './components/ComplianceGuard';
-import { Key, ShieldAlert, ArrowRight, ExternalLink } from 'lucide-react';
+import { ApiSettingsModal } from './components/ApiSettingsModal';
+import { setGlobalApiKeys } from './services/geminiService';
 
 // Import modules
 import { HomeModule as Home } from './components/modules/Home';
@@ -34,18 +35,6 @@ import { AdminPanelModule } from './components/modules/AdminPanel';
 
 import { loadState, saveState } from './services/storageService';
 
-// @google/genai-api:fix - Match expected global type AIStudio and use readonly modifier to avoid declaration conflicts
-declare global {
-  interface AIStudio {
-    hasSelectedApiKey: () => Promise<boolean>;
-    openSelectKey: () => Promise<void>;
-  }
-
-  interface Window {
-    readonly aistudio: AIStudio;
-  }
-}
-
 const App: React.FC = () => {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [activeModuleId, setActiveModuleId] = useState<ModuleId>('home');
@@ -53,35 +42,30 @@ const App: React.FC = () => {
   const [isWelcomeOpen, setIsWelcomeOpen] = useState(false);
   const [isCopyrightOpen, setIsCopyrightOpen] = useState(false);
   const [isComplianceOpen, setIsComplianceOpen] = useState(false);
+  const [isApiModalOpen, setIsApiModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
-  const [hasApiKey, setHasApiKey] = useState(true);
+  const [apiKeys, setApiKeys] = useState<string[]>([]);
   
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const checkApiKey = async () => {
-    try {
-      const selected = await window.aistudio.hasSelectedApiKey();
-      setHasApiKey(selected);
-    } catch (e) {
-      console.warn("API Key checking not available in this environment.");
-    }
-  };
-
   useEffect(() => {
     const initApp = async () => {
-      await checkApiKey();
-      
       const savedUser = await loadState('user');
       const savedState = await loadState('modulesState');
       const welcomeShown = await loadState('welcomeShown');
       const copyrightAccepted = await loadState('copyrightAccepted');
       const complianceAccepted = await loadState('complianceAccepted');
       const lastActiveId = await loadState('lastActiveModuleId');
+      const savedKeys = await loadState('apiKeys');
 
       if (savedUser) setUser(savedUser);
       if (savedState) setModulesState(savedState);
       if (lastActiveId) setActiveModuleId(lastActiveId);
+      if (savedKeys) {
+          setApiKeys(savedKeys);
+          setGlobalApiKeys(savedKeys);
+      }
       
       if (!copyrightAccepted) {
         setIsCopyrightOpen(true);
@@ -95,12 +79,6 @@ const App: React.FC = () => {
     };
     initApp();
   }, []);
-
-  const handleOpenKeySelector = async () => {
-    await window.aistudio.openSelectKey();
-    // Diasumsikan sukses sesuai instruksi race condition
-    setHasApiKey(true);
-  };
 
   const handleModuleStateChange = useCallback((id: ModuleId, state: any) => {
     setModulesState(prev => {
@@ -118,6 +96,12 @@ const App: React.FC = () => {
       return newState;
     });
   }, []);
+
+  const handleSaveApiKeys = async (keys: string[]) => {
+    setApiKeys(keys);
+    setGlobalApiKeys(keys);
+    await saveState('apiKeys', keys);
+  };
 
   const handleLogin = async (profile: UserProfile) => {
     setUser(profile);
@@ -149,48 +133,26 @@ const App: React.FC = () => {
 
   if (isCopyrightOpen) return <CopyrightGuard onComplete={() => { setIsCopyrightOpen(false); saveState('copyrightAccepted', true); }} />;
   if (!user) return <LoginScreen onLogin={handleLogin} />;
-
-  // API KEY SELECTION GUARD
-  if (!hasApiKey) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-950 p-6">
-        <div className="max-w-md w-full bg-slate-900 border border-white/10 rounded-[3rem] p-10 text-center space-y-8 animate-fade-in-up">
-           <div className="w-20 h-20 bg-amber-500/10 rounded-3xl flex items-center justify-center mx-auto border border-amber-500/20">
-              <Key size={40} className="text-amber-500 animate-pulse" />
-           </div>
-           <div className="space-y-2">
-              <h2 className="text-2xl font-black text-white uppercase tracking-tighter">API Key Diperlukan</h2>
-              <p className="text-sm text-gray-400">Untuk menggunakan fitur VEO3 dan AI Studio, Anda harus menggunakan API Key pribadi dari project Google Cloud dengan billing aktif.</p>
-           </div>
-           <div className="p-4 bg-slate-800/50 rounded-2xl flex gap-3 items-start text-left border border-white/5">
-              <ShieldAlert size={18} className="text-amber-500 flex-shrink-0 mt-0.5" />
-              <p className="text-[10px] text-gray-400 leading-relaxed uppercase font-bold tracking-wider">PENTING: Gunakan project dengan tier berbayar (Pay-as-you-go) agar kuota generate video tidak terblokir.</p>
-           </div>
-           <div className="space-y-4">
-              <button 
-                onClick={handleOpenKeySelector}
-                className="w-full py-4 bg-violet-600 hover:bg-violet-500 text-white font-black rounded-2xl shadow-xl shadow-violet-500/20 transition-all transform active:scale-95 flex items-center justify-center gap-2 group"
-              >
-                MASUKKAN API KEY <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
-              </button>
-              <a 
-                href="https://ai.google.dev/gemini-api/docs/billing" 
-                target="_blank" 
-                className="inline-flex items-center gap-1 text-[10px] font-black text-gray-500 uppercase tracking-widest hover:text-violet-400 transition-colors"
-              >
-                Panduan Billing & API Key <ExternalLink size={10} />
-              </a>
-           </div>
-        </div>
-      </div>
-    );
-  }
-
   if (isComplianceOpen) return <ComplianceGuard onAccept={() => { setIsComplianceOpen(false); saveState('complianceAccepted', true); }} />;
 
   return (
-    <Layout user={user} onLogout={handleLogout} activeModuleId={activeModuleId} onNavigate={handleNavigate} isSaving={isSaving}>
+    <Layout 
+      user={user} 
+      onLogout={handleLogout} 
+      activeModuleId={activeModuleId} 
+      onNavigate={handleNavigate} 
+      isSaving={isSaving}
+      onOpenApiSettings={() => setIsApiModalOpen(true)}
+    >
       <WelcomeMessage isOpen={isWelcomeOpen} onClose={() => { setIsWelcomeOpen(false); saveState('welcomeShown', true); }} />
+      
+      <ApiSettingsModal 
+        isOpen={isApiModalOpen}
+        onClose={() => setIsApiModalOpen(false)}
+        onLogout={handleLogout}
+        onSave={handleSaveApiKeys}
+        initialKeys={apiKeys}
+      />
 
       <div style={{ display: activeModuleId === 'home' ? 'block' : 'none' }}>
         <Home onNavigate={handleNavigate} />

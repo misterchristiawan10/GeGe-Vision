@@ -1,7 +1,13 @@
 
 import React, { useState, useEffect } from 'react';
 import { ModuleDefinition, ModuleId, Theme, UserProfile } from '../types';
-import { Menu, X, LogOut, Home, ChevronDown, History, Info, Mail, ShieldCheck, Clock as ClockIcon, Globe, Shield, Lock, Zap, Database, EyeOff, Instagram, MessageCircle, Briefcase, CheckCircle2, Rocket, Code2, Sparkles as SparklesIcon, Key } from 'lucide-react';
+import { 
+  Menu, X, LogOut, Home, ChevronDown, History, Info, Mail, 
+  ShieldCheck, Clock as ClockIcon, Globe, Shield, Lock, Zap, 
+  Database, EyeOff, Instagram, MessageCircle, Briefcase, 
+  CheckCircle2, Rocket, Code2, Sparkles as SparklesIcon, 
+  Settings, Key, Cpu
+} from 'lucide-react';
 import { MODULES } from './modules/Home';
 
 interface LayoutProps {
@@ -11,6 +17,7 @@ interface LayoutProps {
   user: UserProfile | null;
   onLogout: () => void;
   isSaving: boolean;
+  onOpenApiSettings: () => void;
 }
 
 const GeGePrismLogo = ({ size = "md" }: { size?: "sm" | "md" | "lg" }) => {
@@ -58,7 +65,7 @@ const Modal: React.FC<{ isOpen: boolean; onClose: () => void; title: string; chi
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fade-in" onClick={onClose}>
       <div className="bg-white dark:bg-dark-card w-full max-w-2xl rounded-[2.5rem] shadow-2xl border border-gray-200 dark:border-white/5 overflow-hidden" onClick={(e) => e.stopPropagation()}>
         <div className="p-6 border-b border-gray-100 dark:border-white/5 flex justify-between items-center bg-gray-50/50 dark:bg-black/20">
-          <h3 className="font-black text-gray-900 dark:text-white uppercase tracking-[0.2em] text-[10px]">{title}</h3>
+          <h3 className="font-black text-gray-500 dark:text-gray-400 uppercase tracking-[0.2em] text-[10px]">{title}</h3>
           <button onClick={onClose} className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-white/10 transition-all text-gray-400"><X size={18} /></button>
         </div>
         <div className="p-8 text-sm text-gray-600 dark:text-gray-300 leading-relaxed max-h-[75vh] overflow-y-auto custom-scrollbar">
@@ -69,7 +76,7 @@ const Modal: React.FC<{ isOpen: boolean; onClose: () => void; title: string; chi
   );
 };
 
-export const Layout: React.FC<LayoutProps> = ({ children, activeModuleId, onNavigate, user, onLogout, isSaving }) => {
+export const Layout: React.FC<LayoutProps> = ({ children, activeModuleId, onNavigate, user, onLogout, isSaving, onOpenApiSettings }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeModal, setActiveModal] = useState<'privacy' | 'contact' | 'about' | null>(null);
   const [openCategories, setOpenCategories] = useState<Record<string, boolean>>({
@@ -94,13 +101,166 @@ export const Layout: React.FC<LayoutProps> = ({ children, activeModuleId, onNavi
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleManageKey = async () => {
-    await window.aistudio.openSelectKey();
-  };
-
   return (
     <div className="min-h-screen flex flex-col md:flex-row bg-gray-50 dark:bg-dark-bg transition-colors duration-300">
       
+      {/* About Modal */}
+      <Modal isOpen={activeModal === 'about'} onClose={() => setActiveModal(null)} title="THE CORE VISION: SCALING FUTURE">
+        <div className="space-y-8 py-2">
+          <div className="text-center space-y-3">
+             <div className="w-20 h-20 bg-indigo-600 rounded-3xl flex items-center justify-center text-white mx-auto shadow-xl shadow-indigo-500/20 transform rotate-3 hover:rotate-0 transition-transform">
+                <Rocket size={40} />
+             </div>
+             <h2 className="text-3xl font-black tracking-tight text-gray-900 dark:text-white uppercase">Apa itu GeGe Vision?</h2>
+             <p className="text-xs font-bold text-gray-500 dark:text-gray-400">The Ultimate Creative OS for Digital Visionaries</p>
+          </div>
+
+          <div className="space-y-8">
+             <div className="p-8 rounded-[2.5rem] bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/5 text-center shadow-inner">
+                <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+                   <span className="font-black text-indigo-600">GeGe Vision</span> bukan sekadar aplikasi AI biasa. Kami adalah ekosistem terpadu yang dirancang untuk menjadi "Brain Extension" bagi para kreator, desainer, dan pebisnis digital. Dengan engine <b>Prism v1.2.0</b>, kami menyatukan kekuatan generative AI tingkat tinggi ke dalam alur kerja yang intuitif dan <i>hassle-free</i>.
+                </p>
+             </div>
+
+             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="p-6 rounded-[2rem] bg-amber-50 dark:bg-amber-900/10 border border-amber-100 dark:border-amber-900/20 space-y-3 hover:scale-105 transition-transform">
+                   <div className="text-amber-600 dark:text-amber-400 font-black text-xs uppercase tracking-widest">GOLD</div>
+                   <p className="text-xs font-medium leading-relaxed">Kualitas premium tanpa kompromi. Setiap piksel dan bit audio diproses untuk hasil standar industri.</p>
+                </div>
+                <div className="p-6 rounded-[2rem] bg-blue-50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-900/20 space-y-3 hover:scale-105 transition-transform">
+                   <div className="text-blue-600 dark:text-blue-400 font-black text-xs uppercase tracking-widest">GOSPEL</div>
+                   <p className="text-xs font-medium leading-relaxed">Integritas data adalah harga mati. Privasi pengguna dan kedaulatan digital adalah fondasi kami.</p>
+                </div>
+                <div className="p-6 rounded-[2rem] bg-violet-50 dark:bg-violet-900/10 border border-violet-100 dark:border-violet-900/20 space-y-3 hover:scale-105 transition-transform">
+                   <div className="text-violet-600 dark:text-violet-400 font-black text-xs uppercase tracking-widest">GEGE</div>
+                   <p className="text-xs font-medium leading-relaxed">Winning energy. Kami memberikan <i>leverage</i> tak terbatas agar karya Anda selalu jadi "Final Boss" di market.</p>
+                </div>
+             </div>
+
+             <div className="bg-slate-950 rounded-[2.5rem] p-8 text-white overflow-hidden relative shadow-2xl">
+                <div className="absolute -right-10 -bottom-10 opacity-5 group-hover:opacity-10 transition-opacity">
+                   <Code2 size={200} />
+                </div>
+                <h4 className="font-bold text-base mb-6 flex items-center gap-3">
+                   <SparklesIcon size={20} className="text-yellow-400" /> Technology Stack
+                </h4>
+                <div className="flex flex-wrap gap-2">
+                   {['GOOGLE GEMINI 3', 'VEO 3.1', 'PRISM ENGINE', 'EDGE COMPUTE', 'LOCAL-FIRST DB'].map(tech => (
+                      <span key={tech} className="px-4 py-2 bg-white/10 rounded-xl text-[10px] font-black uppercase tracking-widest border border-white/5 hover:bg-white/20 transition-colors">{tech}</span>
+                   ))}
+                </div>
+                <p className="text-[10px] mt-8 opacity-60 italic font-medium">Handcrafted with precision by GeGe Creative Studio.</p>
+             </div>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Privacy Modal */}
+      <Modal isOpen={activeModal === 'privacy'} onClose={() => setActiveModal(null)} title="DIGITAL SOVEREIGNTY & GEGE VAULT">
+        <div className="space-y-8 py-2">
+          <div className="text-center space-y-2">
+             <div className="w-20 h-20 bg-violet-500/10 rounded-[2rem] flex items-center justify-center text-violet-500 mx-auto border border-violet-500/20 shadow-inner">
+                <Lock size={40} />
+             </div>
+             <h2 className="text-3xl font-black tracking-tight text-gray-900 dark:text-white">Privasi Anda Adalah Prioritas Gold Kami</h2>
+             <p className="text-xs font-bold text-gray-500 dark:text-gray-400">Versi 1.2.0 • Protokol Keamanan Ephemeral Aktif</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+             <div className="p-6 rounded-[2.5rem] bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/5 space-y-4 hover:shadow-lg transition-all">
+                <div className="flex items-center gap-3 text-violet-500 font-black text-xs uppercase tracking-widest">
+                   <Zap size={18} /> EPHEMERAL PROCESSING
+                </div>
+                <p className="text-xs leading-relaxed text-gray-600 dark:text-gray-400">Setiap piksel yang Anda unggah diproses secara <b>real-time</b> melalui Google Gemini API tingkat tinggi. GeGe Vision tidak menyimpan salinan data mentah Anda di server pusat kami. Begitu sesi selesai, data menghilang bagai debu digital.</p>
+             </div>
+
+             <div className="p-6 rounded-[2.5rem] bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/5 space-y-4 hover:shadow-lg transition-all">
+                <div className="flex items-center gap-3 text-indigo-500 font-black text-xs uppercase tracking-widest">
+                   <Database size={18} /> LOCAL-FIRST MEMORY
+                </div>
+                <p className="text-xs leading-relaxed text-gray-600 dark:text-gray-400">Kami menggunakan teknologi <b>IndexedDB</b> (penyimpanan lokal peramban) untuk menyimpan riwayat kreasi Anda. Artinya, aset berharga Anda tetap berada di perangkat Anda, bukan di tangan pihak ketiga. Anda pegang kendali penuh.</p>
+             </div>
+
+             <div className="p-6 rounded-[2.5rem] bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/5 space-y-4 hover:shadow-lg transition-all">
+                <div className="flex items-center gap-3 text-emerald-500 font-black text-xs uppercase tracking-widest">
+                   <EyeOff size={18} /> ZERO TRACKING POLICY
+                </div>
+                <p className="text-xs leading-relaxed text-gray-600 dark:text-gray-400">GeGe Vision bebas dari iklan yang mengganggu dan pelacak perilaku (trackers). Kami tidak menjual data kebiasaan kreatif Anda kepada broker data. Kami di sini untuk akselerasi karya, bukan eksploitasi data.</p>
+             </div>
+
+             <div className="p-6 rounded-[2.5rem] bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/5 space-y-4 hover:shadow-lg transition-all">
+                <div className="flex items-center gap-3 text-rose-500 font-black text-xs uppercase tracking-widest">
+                   <Shield size={18} /> ENTERPRISE GRADE ENCRYPTION
+                </div>
+                <p className="text-xs leading-relaxed text-gray-600 dark:text-gray-400">Semua komunikasi antara browser Anda dan mesin AI kami dilindungi oleh enkripsi <b>TLS 1.3</b>. Koneksi aman, ide aman, hasil pun aman. Tidak ada celah untuk penyadapan data visual Anda.</p>
+             </div>
+          </div>
+
+          <div className="p-8 rounded-[2.5rem] bg-indigo-950 text-white space-y-6 shadow-2xl relative overflow-hidden">
+             <div className="absolute top-0 right-0 p-4 opacity-10">
+               <ShieldCheck size={100} />
+             </div>
+             <h4 className="font-bold text-base flex items-center gap-3">
+                <CheckCircle2 size={24} className="text-emerald-400" /> Komitmen GeGe Vision
+             </h4>
+             <p className="text-xs opacity-90 leading-relaxed italic font-serif">
+                "Kami percaya bahwa kreativitas tanpa privasi adalah kerentanan. Di GeGe Vision, kami membangun benteng digital supaya imajinasi Anda bisa terbang bebas tanpa rasa takut diawasi. Gold untuk kualitas, Gospel untuk integritas, dan GeGe untuk kemenangan karya Anda."
+             </p>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Contact Modal */}
+      <Modal isOpen={activeModal === 'contact'} onClose={() => setActiveModal(null)} title="CONNECT WITH CREATIVE HQ">
+        <div className="space-y-8 py-2">
+          <div className="text-center space-y-3">
+             <div className="w-20 h-20 bg-indigo-500/10 rounded-full flex items-center justify-center text-indigo-500 mx-auto border border-indigo-500/20 shadow-inner">
+                <MessageCircle size={40} />
+             </div>
+             <h2 className="text-2xl font-black tracking-tight text-gray-900 dark:text-white uppercase italic">Let's Sync Your Vision!</h2>
+             <p className="text-xs text-gray-500 dark:text-gray-400 max-w-sm mx-auto leading-relaxed">
+                Punya ide gila, butuh support teknis, atau mau kolaborasi bisnis? Tim spesialis AI kami siap bantu <b>gaspol</b> progres Anda.
+             </p>
+          </div>
+
+          <div className="grid grid-cols-1 gap-4">
+             <a href="mailto:support@gegevision.com" className="flex items-center gap-6 p-6 bg-white dark:bg-white/5 border border-gray-100 dark:border-white/5 rounded-[2rem] hover:border-indigo-500 transition-all group shadow-sm">
+                <div className="w-14 h-14 rounded-2xl bg-indigo-600 text-white flex items-center justify-center group-hover:scale-110 group-hover:rotate-3 transition-transform shadow-lg shadow-indigo-500/20">
+                   <Mail size={24}/>
+                </div>
+                <div className="flex-1">
+                   <p className="text-[10px] font-black text-indigo-500 uppercase tracking-widest mb-1">Official Inquiry</p>
+                   <p className="text-sm font-black text-gray-900 dark:text-white group-hover:text-indigo-500 transition-colors">support@gegevision.com</p>
+                   <p className="text-[10px] text-gray-400 mt-1">Response time: &lt; 24 jam</p>
+                </div>
+                <Zap size={20} className="text-gray-300 group-hover:text-yellow-500 transition-colors" />
+             </a>
+
+             <div className="flex items-center gap-6 p-6 bg-white dark:bg-white/5 border border-gray-100 dark:border-white/5 rounded-[2rem] group shadow-sm">
+                <div className="w-14 h-14 rounded-2xl bg-violet-600 text-white flex items-center justify-center shadow-lg shadow-violet-500/20">
+                   <Briefcase size={24}/>
+                </div>
+                <div className="flex-1">
+                   <p className="text-[10px] font-black text-violet-500 uppercase tracking-widest mb-1">Partnerships</p>
+                   <p className="text-sm font-black text-gray-900 dark:text-white">business@gegevision.com</p>
+                   <p className="text-[10px] text-gray-400 mt-1">Scale your project with our AI Engine.</p>
+                </div>
+             </div>
+
+             <div className="grid grid-cols-2 gap-4">
+                <a href="#" className="flex flex-col items-center gap-4 p-6 bg-white dark:bg-white/5 border border-gray-100 dark:border-white/5 rounded-[2rem] hover:border-pink-500 transition-all group text-center">
+                   <Instagram size={32} className="text-pink-500 group-hover:scale-125 transition-transform" />
+                   <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest group-hover:text-pink-500">Instagram</span>
+                </a>
+                <a href="#" className="flex flex-col items-center gap-4 p-6 bg-white dark:bg-white/5 border border-gray-100 dark:border-white/5 rounded-[2rem] hover:border-emerald-500 transition-all group text-center">
+                   <Globe size={32} className="text-emerald-500 group-hover:scale-125 transition-transform" />
+                   <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest group-hover:text-emerald-500">Community HQ</span>
+                </a>
+             </div>
+          </div>
+        </div>
+      </Modal>
+
       {/* Sidebar */}
       <aside 
         className={`fixed inset-y-0 left-0 z-50 w-72 bg-white dark:bg-dark-card border-r border-gray-200 dark:border-gray-800 transform transition-transform duration-300 lg:relative lg:translate-x-0 ${isMobileMenuOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full'}`}
@@ -119,15 +279,15 @@ export const Layout: React.FC<LayoutProps> = ({ children, activeModuleId, onNavi
           <nav className="flex-1 overflow-y-auto p-4 space-y-6 custom-scrollbar">
              {/* Key Management Button */}
             <button 
-                onClick={handleManageKey}
-                className="w-full flex items-center gap-3 px-3 py-2 rounded-xl bg-amber-500/5 hover:bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 transition-all group"
+                onClick={onOpenApiSettings}
+                className="w-full flex items-center gap-3 px-3 py-2 rounded-xl bg-violet-600/5 hover:bg-violet-600/10 border border-violet-500/20 text-violet-600 dark:text-violet-400 transition-all group"
             >
-                <div className="p-1.5 bg-amber-500 rounded-lg text-white shadow-lg shadow-amber-500/20 group-hover:scale-110 transition-transform">
-                    <Key size={14} />
+                <div className="p-1.5 bg-violet-600 rounded-lg text-white shadow-lg shadow-violet-500/20 group-hover:scale-110 transition-transform">
+                    <Settings size={14} />
                 </div>
                 <div className="text-left">
-                    <p className="text-[10px] font-black uppercase tracking-widest">API Key Active</p>
-                    <p className="text-[9px] opacity-70">Ganti / Atur Kunci Anda</p>
+                    <p className="text-[10px] font-black uppercase tracking-widest leading-none mb-1">API Vault Settings</p>
+                    <p className="text-[9px] opacity-70">Kelola 3 API Key Anda</p>
                 </div>
             </button>
 
@@ -195,14 +355,68 @@ export const Layout: React.FC<LayoutProps> = ({ children, activeModuleId, onNavi
            <div className="w-10"></div>
         </header>
 
-        <div className="flex-1 overflow-y-auto">
-          <div className="max-w-7xl mx-auto p-4 md:p-10 min-h-[calc(100vh-140px)]">
+        <div className="flex-1 overflow-y-auto flex flex-col">
+          <div className="flex-1 max-w-7xl mx-auto w-full p-4 md:p-10">
             {children}
           </div>
-          <footer className="bg-white dark:bg-dark-card border-t border-gray-100 dark:border-gray-800 py-10 px-6">
-            <div className="max-w-7xl mx-auto text-center">
-                <p className="text-xs font-bold text-gray-900 dark:text-white">Dibuat dengan ❤️ oleh GeGe Teams.</p>
-                <p className="text-[10px] text-gray-400 mt-1">© 2025 GeGe Vision. All rights reserved.</p>
+          
+          {/* ACCURATE FOOTER AS PER USER REFERENCE */}
+          <footer className="bg-white dark:bg-dark-card border-t border-gray-100 dark:border-gray-800 py-12 px-8 mt-auto">
+            <div className="max-w-7xl mx-auto">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
+                    {/* Column 1: App Info */}
+                    <div className="space-y-6">
+                        <div className="flex items-center gap-4">
+                            <GeGePrismLogo size="sm" />
+                            <div>
+                                <h3 className="text-xl font-black text-gray-900 dark:text-white tracking-tighter">GEGE VISION</h3>
+                                <p className="text-[10px] font-black text-violet-500 uppercase tracking-widest leading-none mt-1">GOLD, GOSPEL, GEGE</p>
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-3 pt-2">
+                            <div className="bg-violet-100 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest border border-violet-200 dark:border-violet-800/50 shadow-sm">
+                                Operational
+                            </div>
+                            <span className="text-[10px] text-gray-400 font-mono">v1.2.0-PRISM</span>
+                        </div>
+                    </div>
+
+                    {/* Column 2: Layanan */}
+                    <div className="flex flex-col">
+                        <h4 className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] mb-6">LAYANAN</h4>
+                        <ul className="space-y-3">
+                            <li><button onClick={() => handleNavClick('home')} className="text-xs font-bold text-gray-600 dark:text-gray-400 hover:text-violet-500 transition-colors">AI Studio</button></li>
+                            <li><button onClick={() => handleNavClick('vidgen')} className="text-xs font-bold text-gray-600 dark:text-gray-400 hover:text-violet-500 transition-colors">AI Video</button></li>
+                            <li><button onClick={() => handleNavClick('rebel-fx')} className="text-xs font-bold text-gray-600 dark:text-gray-400 hover:text-violet-500 transition-colors">AI Trading</button></li>
+                        </ul>
+                    </div>
+
+                    {/* Column 3: Legal & Support */}
+                    <div className="flex flex-col">
+                        <h4 className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] mb-6">LEGAL & SUPPORT</h4>
+                        <ul className="space-y-3">
+                            <li><button onClick={() => setActiveModal('privacy')} className="text-xs font-bold text-gray-600 dark:text-gray-400 hover:text-violet-500 transition-colors">Privasi</button></li>
+                            <li><button onClick={() => setActiveModal('contact')} className="text-xs font-bold text-gray-600 dark:text-gray-400 hover:text-violet-500 transition-colors">Kontak</button></li>
+                            <li><button onClick={() => setActiveModal('about')} className="text-xs font-bold text-gray-600 dark:text-gray-400 hover:text-violet-500 transition-colors">Tentang Aplikasi</button></li>
+                        </ul>
+                    </div>
+
+                    {/* Column 4: Credits & Social Icons */}
+                    <div className="md:text-right space-y-6">
+                        <div className="space-y-1">
+                            <p className="text-xs font-bold text-gray-900 dark:text-white">Dibuat dengan ❤️ oleh <span className="font-black text-violet-600">GeGe Teams.</span></p>
+                            <p className="text-[10px] text-gray-400">© 2025 GeGe Vision. All rights reserved.</p>
+                        </div>
+                        <div className="flex md:justify-end gap-3 pt-4">
+                            <button onClick={() => setActiveModal('privacy')} className="p-2 bg-gray-50 dark:bg-gray-800 rounded-full text-gray-400 hover:text-violet-500 transition-all border border-gray-100 dark:border-gray-700 shadow-sm">
+                                <ShieldCheck size={18} />
+                            </button>
+                            <button onClick={() => setActiveModal('about')} className="p-2 bg-gray-50 dark:bg-gray-800 rounded-full text-gray-400 hover:text-violet-500 transition-all border border-gray-100 dark:border-gray-700 shadow-sm">
+                                <Info size={18} />
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
           </footer>
         </div>
