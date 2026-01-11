@@ -104,9 +104,9 @@ export const Layout: React.FC<LayoutProps> = ({ children, activeModuleId, onNavi
   };
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row bg-gray-50 dark:bg-dark-bg transition-colors duration-300 overflow-x-hidden">
+    <div className="min-h-screen flex flex-col md:flex-row bg-gray-50 dark:bg-dark-bg transition-colors duration-300">
       
-      {/* Modals */}
+      {/* Modals remain the same */}
       <Modal isOpen={activeModal === 'about'} onClose={() => setActiveModal(null)} title="THE CORE VISION: SCALING FUTURE">
         <div className="space-y-8 py-2">
           <div className="text-center space-y-3">
@@ -126,7 +126,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, activeModuleId, onNavi
 
       {/* Sidebar */}
       <aside 
-        className={`fixed inset-y-0 left-0 z-[100] w-72 bg-white dark:bg-dark-card border-r border-gray-200 dark:border-gray-800 transform transition-transform duration-300 lg:relative lg:translate-x-0 ${isMobileMenuOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full'}`}
+        className={`fixed inset-y-0 left-0 z-50 w-72 bg-white dark:bg-dark-card border-r border-gray-200 dark:border-gray-800 transform transition-transform duration-300 lg:relative lg:translate-x-0 ${isMobileMenuOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full'}`}
       >
         <div className="h-full flex flex-col">
           <div className="p-6 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
@@ -141,13 +141,13 @@ export const Layout: React.FC<LayoutProps> = ({ children, activeModuleId, onNavi
           </div>
 
           <nav className="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar">
-            {/* Theme Toggle */}
+            {/* Theme Toggle Button */}
             <button 
                 onClick={onToggleTheme}
                 className="w-full flex items-center justify-between px-3 py-3 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700 text-gray-700 dark:text-gray-200 transition-all group shadow-sm"
             >
                 <div className="flex items-center gap-3">
-                    <div className="p-2 bg-indigo-50 dark:bg-indigo-900/30 rounded-lg text-indigo-600 dark:text-indigo-400">
+                    <div className="p-2 bg-indigo-50 dark:bg-indigo-900/30 rounded-lg text-indigo-600 dark:text-indigo-400 group-hover:scale-110 transition-transform">
                         {theme === 'light' ? <Moon size={16} /> : <Sun size={16} />}
                     </div>
                     <span className="text-[10px] font-black uppercase tracking-widest leading-none">
@@ -159,11 +159,12 @@ export const Layout: React.FC<LayoutProps> = ({ children, activeModuleId, onNavi
                 </div>
             </button>
 
+             {/* Key Management Button */}
             <button 
                 onClick={onOpenApiSettings}
                 className="w-full flex items-center gap-3 px-3 py-2 rounded-xl bg-violet-600/5 hover:bg-violet-600/10 border border-violet-500/20 text-violet-600 dark:text-violet-400 transition-all group"
             >
-                <div className="p-1.5 bg-violet-600 rounded-lg text-white shadow-lg">
+                <div className="p-1.5 bg-violet-600 rounded-lg text-white shadow-lg shadow-violet-500/20 group-hover:scale-110 transition-transform">
                     <Settings size={14} />
                 </div>
                 <div className="text-left">
@@ -227,9 +228,8 @@ export const Layout: React.FC<LayoutProps> = ({ children, activeModuleId, onNavi
         </div>
       </aside>
 
-      {/* Main Container */}
-      <main className="flex-1 flex flex-col min-w-0 min-h-screen">
-        <header className="lg:hidden bg-white dark:bg-dark-card border-b border-gray-200 dark:border-gray-800 p-4 flex items-center justify-between sticky top-0 z-[60]">
+      <main className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden">
+        <header className="lg:hidden bg-white dark:bg-dark-card border-b border-gray-200 dark:border-gray-800 p-4 flex items-center justify-between sticky top-0 z-40">
            <button onClick={() => setIsMobileMenuOpen(true)} className="p-2 -ml-2 text-gray-500 dark:text-gray-400"><Menu size={24} /></button>
            <div className="font-black text-violet-600 flex items-center gap-2 dark:text-violet-400">
               <GeGePrismLogo size="sm" /> GEGE VISION
@@ -255,26 +255,36 @@ export const Layout: React.FC<LayoutProps> = ({ children, activeModuleId, onNavi
                                 <p className="text-[10px] font-black text-violet-500 uppercase tracking-widest leading-none mt-1">GOLD, GOSPEL, GEGE</p>
                             </div>
                         </div>
+                        <div className="flex items-center gap-3 pt-2">
+                            <div className="bg-violet-100 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest border border-violet-200 dark:border-violet-800/50 shadow-sm">
+                                Operational
+                            </div>
+                            <span className="text-[10px] text-gray-400 font-mono">v1.2.0-PRISM</span>
+                        </div>
                     </div>
 
                     <div className="flex flex-col">
                         <h4 className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] mb-6">LAYANAN</h4>
                         <ul className="space-y-3">
                             <li><button onClick={() => handleNavClick('home')} className="text-xs font-bold text-gray-600 dark:text-gray-400 hover:text-violet-500 transition-colors">AI Studio</button></li>
+                            <li><button onClick={() => handleNavClick('vidgen')} className="text-xs font-bold text-gray-600 dark:text-gray-400 hover:text-violet-500 transition-colors">AI Video</button></li>
+                            <li><button onClick={() => handleNavClick('rebel-fx')} className="text-xs font-bold text-gray-600 dark:text-gray-400 hover:text-violet-500 transition-colors">AI Trading</button></li>
                         </ul>
                     </div>
 
                     <div className="flex flex-col">
-                        <h4 className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] mb-6">SUPPORT</h4>
+                        <h4 className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] mb-6">LEGAL & SUPPORT</h4>
                         <ul className="space-y-3">
+                            <li><button onClick={() => setActiveModal('privacy')} className="text-xs font-bold text-gray-600 dark:text-gray-400 hover:text-violet-500 transition-colors">Privasi</button></li>
+                            <li><button onClick={() => setActiveModal('contact')} className="text-xs font-bold text-gray-600 dark:text-gray-400 hover:text-violet-500 transition-colors">Kontak</button></li>
                             <li><button onClick={() => setActiveModal('about')} className="text-xs font-bold text-gray-600 dark:text-gray-400 hover:text-violet-500 transition-colors">Tentang Aplikasi</button></li>
                         </ul>
                     </div>
 
                     <div className="md:text-right space-y-6">
                         <div className="space-y-1">
-                            <p className="text-xs font-bold text-gray-900 dark:text-white">Dibuat oleh <span className="font-black text-violet-600">GeGe Teams.</span></p>
-                            <p className="text-[10px] text-gray-400">© 2025 GeGe Vision.</p>
+                            <p className="text-xs font-bold text-gray-900 dark:text-white">Dibuat dengan ❤️ oleh <span className="font-black text-violet-600">GeGe Teams.</span></p>
+                            <p className="text-[10px] text-gray-400">© 2025 GeGe Vision. All rights reserved.</p>
                         </div>
                     </div>
                 </div>
@@ -295,7 +305,7 @@ const NavButton: React.FC<{ active: boolean; onClick: () => void; icon: React.El
         : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800/50 hover:text-gray-900 dark:hover:text-white'
     } ${isSub ? 'pl-4' : ''}`}
   >
-    <div className={`flex items-center justify-center w-6 ${active ? 'scale-110' : ''}`}>
+    <div className={`flex items-center justify-center w-6 transition-transform duration-300 ${active ? 'scale-110' : 'group-hover:scale-110'}`}>
       <Icon size={isSub ? 16 : 20} strokeWidth={active ? 2.5 : 2} />
     </div>
     <span className={isSub ? 'text-xs' : 'text-sm'}>{children}</span>
