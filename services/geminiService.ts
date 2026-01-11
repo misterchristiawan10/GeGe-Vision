@@ -9,10 +9,21 @@ export const setGlobalApiKeys = (keys: string[]) => {
 };
 
 /**
+ * Fungsi untuk mengacak array (Fisher-Yates Shuffle)
+ */
+function shuffleArray<T>(array: T[]): T[] {
+  const newArr = [...array];
+  for (let i = newArr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [newArr[i], newArr[j]] = [newArr[j], newArr[i]];
+  }
+  return newArr;
+}
+
+/**
  * Fungsi Inti: Mengeksekusi pemanggilan API dengan sistem rotasi jika kuota habis (Error 429)
  */
 async function callWithRetry<T>(apiCall: (ai: any) => Promise<T>): Promise<T> {
-  // Ambil kunci dari vault lokal jika tersedia, jika tidak pakai ENV
   const vaultData = localStorage.getItem('gege_api_vault');
   let localKeys: string[] = [];
   let useSystemKey = true;
@@ -25,36 +36,59 @@ async function callWithRetry<T>(apiCall: (ai: any) => Promise<T>): Promise<T> {
     } catch(e) {}
   }
 
-  const keysToTry = [...localKeys];
-  if (useSystemKey) {
-    keysToTry.push(process.env.API_KEY || "");
+  // Gabungkan dan acak kunci agar distribusi beban merata
+  let keysToTry = shuffleArray([...localKeys]);
+  if (useSystemKey && process.env.API_KEY) {
+    keysToTry.push(process.env.API_KEY);
+  }
+
+  // Hapus duplikat
+  keysToTry = [...new Set(keysToTry)];
+
+  if (keysToTry.length === 0) {
+    throw new Error("Tidak ada API Key yang aktif. Silakan isi di menu Settings.");
   }
 
   let lastError: any = null;
 
   for (let i = 0; i < keysToTry.length; i++) {
     const currentKey = keysToTry[i];
-    if (!currentKey) continue;
+    const keyDisplay = `${currentKey.substring(0, 6)}...${currentKey.substring(currentKey.length - 4)}`;
+    
+    console.log(`[GeGe AI] Mencoba Kunci #${i + 1} (${keyDisplay})`);
 
     try {
       const ai = new GoogleGenAI({ apiKey: currentKey });
-      return await apiCall(ai);
+      const result = await apiCall(ai);
+      console.log(`[GeGe AI] ✅ Berhasil menggunakan Kunci #${i + 1}`);
+      return result;
     } catch (error: any) {
       lastError = error;
       const errorMsg = error?.message?.toLowerCase() || "";
+      const isQuotaError = errorMsg.includes("429") || errorMsg.includes("quota") || errorMsg.includes("limit");
       
-      // Jika error adalah quota limit (429) atau limit harian atau kunci tidak valid
-      if (errorMsg.includes("429") || errorMsg.includes("quota") || errorMsg.includes("limit") || errorMsg.includes("api_key_invalid")) {
-        console.warn(`[API Failover] Kunci #${i + 1} gagal/habis kuota. Mencoba kunci berikutnya...`);
+      if (isQuotaError) {
+        console.warn(`[GeGe AI] ⚠️ Kunci #${i + 1} terkena limit kuota. Mencoba kunci lain...`);
+        // Beri jeda sangat singkat sebelum pindah kunci
+        await new Promise(r => setTimeout(r, 200));
         continue; 
       }
-      // Jika error lain yang fatal (bukan quota), lempar ke UI
+      
+      // Jika error bukan karena kuota (misal: prompt dilarang), langsung lempar errornya
       throw error;
     }
   }
   
-  // Jika semua kunci sudah dicoba dan gagal
-  throw lastError || new Error("Semua API Key yang tersedia gagal atau habis kuota harian.");
+  // Jika sampai sini, berarti semua kunci gagal
+  const totalKeys = keysToTry.length;
+  console.error(`[GeGe AI] ❌ Semua (${totalKeys}) kunci gagal.`);
+  
+  // Modifikasi pesan error agar lebih informatif
+  if (lastError?.message?.includes("429")) {
+      throw new Error(`Seluruh (${totalKeys}) API Key kamu sudah habis kuota hari ini. Google membatasi generate gambar di akun Free Tier. Coba lagi 1 jam lagi atau gunakan akun Google lain.`);
+  }
+
+  throw lastError || new Error("Gagal terhubung ke AI.");
 }
 
 export interface StoryboardSceneData {
