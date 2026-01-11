@@ -12,7 +12,24 @@ export const setGlobalApiKeys = (keys: string[]) => {
  * Fungsi Inti: Mengeksekusi pemanggilan API dengan sistem rotasi jika kuota habis (Error 429)
  */
 async function callWithRetry<T>(apiCall: (ai: any) => Promise<T>): Promise<T> {
-  const keysToTry = activeKeys.length > 0 ? activeKeys : [process.env.API_KEY || ""];
+  // Ambil kunci dari vault lokal jika tersedia, jika tidak pakai ENV
+  const vaultData = localStorage.getItem('gege_api_vault');
+  let localKeys: string[] = [];
+  let useSystemKey = true;
+
+  if (vaultData) {
+    try {
+      const parsed = JSON.parse(vaultData);
+      localKeys = parsed.keys.filter((k: string, i: number) => parsed.activeToggles[i] && k.trim().length >= 30);
+      useSystemKey = parsed.useSystemKey !== false;
+    } catch(e) {}
+  }
+
+  const keysToTry = [...localKeys];
+  if (useSystemKey) {
+    keysToTry.push(process.env.API_KEY || "");
+  }
+
   let lastError: any = null;
 
   for (let i = 0; i < keysToTry.length; i++) {
@@ -24,18 +41,20 @@ async function callWithRetry<T>(apiCall: (ai: any) => Promise<T>): Promise<T> {
       return await apiCall(ai);
     } catch (error: any) {
       lastError = error;
-      const errorMsg = error?.message || "";
+      const errorMsg = error?.message?.toLowerCase() || "";
       
-      // Jika error adalah quota limit (429) atau kunci tidak valid, coba kunci berikutnya
-      if (errorMsg.includes("429") || errorMsg.includes("quota") || errorMsg.includes("API_KEY_INVALID")) {
+      // Jika error adalah quota limit (429) atau limit harian atau kunci tidak valid
+      if (errorMsg.includes("429") || errorMsg.includes("quota") || errorMsg.includes("limit") || errorMsg.includes("api_key_invalid")) {
         console.warn(`[API Failover] Kunci #${i + 1} gagal/habis kuota. Mencoba kunci berikutnya...`);
         continue; 
       }
-      // Jika error lain yang bersifat fatal, langsung lempar
+      // Jika error lain yang fatal (bukan quota), lempar ke UI
       throw error;
     }
   }
-  throw lastError || new Error("Semua API Key yang tersedia gagal atau habis kuota.");
+  
+  // Jika semua kunci sudah dicoba dan gagal
+  throw lastError || new Error("Semua API Key yang tersedia gagal atau habis kuota harian.");
 }
 
 export interface StoryboardSceneData {
