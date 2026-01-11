@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { UserProfile, ModuleId } from './types';
+import { UserProfile, ModuleId, Theme } from './types';
 import { LoginScreen } from './components/LoginScreen';
 import { Layout } from './components/Layout';
 import { WelcomeMessage } from './components/WelcomeMessage';
@@ -46,8 +46,31 @@ const App: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [apiKeys, setApiKeys] = useState<string[]>([]);
+  const [theme, setTheme] = useState<Theme>('light');
   
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Theme Sync
+  useEffect(() => {
+    const initTheme = async () => {
+      const savedTheme = await loadState('theme') as Theme;
+      if (savedTheme) {
+        setTheme(savedTheme);
+      } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        setTheme('dark');
+      }
+    };
+    initTheme();
+  }, []);
+
+  useEffect(() => {
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+    saveState('theme', theme);
+  }, [theme]);
 
   useEffect(() => {
     const initApp = async () => {
@@ -127,6 +150,10 @@ const App: React.FC = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const toggleTheme = () => {
+    setTheme(prev => prev === 'light' ? 'dark' : 'light');
+  };
+
   if (isLoading) {
     return <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-dark-bg"><div className="w-12 h-12 border-4 border-violet-500 border-t-transparent rounded-full animate-spin"></div></div>;
   }
@@ -143,6 +170,8 @@ const App: React.FC = () => {
       onNavigate={handleNavigate} 
       isSaving={isSaving}
       onOpenApiSettings={() => setIsApiModalOpen(true)}
+      theme={theme}
+      onToggleTheme={toggleTheme}
     >
       <WelcomeMessage isOpen={isWelcomeOpen} onClose={() => { setIsWelcomeOpen(false); saveState('welcomeShown', true); }} />
       

@@ -198,11 +198,9 @@ export const GeneratorModule: React.FC<GeneratorModuleProps> = (props) => {
     setResultHistory(prev => [historyEntry, ...prev].slice(0, 15));
   };
 
-  // Improved Download Handler
   const handleDownload = async (imageUrl: string | null, filename: string) => {
     if (!imageUrl) return;
     try {
-      // Convert base64/url to blob
       const response = await fetch(imageUrl);
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
@@ -213,18 +211,10 @@ export const GeneratorModule: React.FC<GeneratorModuleProps> = (props) => {
       document.body.appendChild(link);
       link.click();
       
-      // Cleanup
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
     } catch (e) {
-      console.error("Download failed, falling back to direct link", e);
-      // Fallback
-      const link = document.createElement('a');
-      link.href = imageUrl;
-      link.download = filename;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      console.error("Download failed", e);
     }
   };
 
@@ -407,7 +397,7 @@ export const GeneratorModule: React.FC<GeneratorModuleProps> = (props) => {
 
                 for (let i = 0; i < settings.batchCount; i++) {
                 setLoadingMessage(`Mengenerate gambar ${i + 1} dari ${settings.batchCount} (Pose Acak)...`);
-                const batchVariationPrompt = `${finalPrompt} \n\n[VARIASI BATCH #${i + 1}: Hasilkan variasi pose, sudut pandang, dan ekspresi yang unik dan berbeda dari biasanya. Acak gaya pose agar dinamis.]`;
+                const batchVariationPrompt = `${finalPrompt} \n\n[VARIASI BATCH #${i + 1}: Pose acak]`;
 
                 try {
                     const result = await generateCreativeImage(batchVariationPrompt, image, settings.aspectRatio, settings.imageSize, refImage, faceImage2);
@@ -438,7 +428,7 @@ export const GeneratorModule: React.FC<GeneratorModuleProps> = (props) => {
 
         } catch (err: any) {
         console.error(err);
-        setError(err.message || "Gagal membuat gambar. Silakan coba lagi.");
+        setError(err.message || "Gagal membuat gambar.");
         setProgress(0);
         } finally {
         clearInterval(progressInterval);
@@ -449,31 +439,21 @@ export const GeneratorModule: React.FC<GeneratorModuleProps> = (props) => {
 
     const handleQuickEdit = async (editInstruction: string) => {
         if (!generatedImage) return;
-
         const { progressInterval, messageInterval } = startLoadingFlow(settings.imageSize);
         setLoadingMessage("Menerapkan pengeditan...");
-
         try {
         const res = await fetch(generatedImage);
         const blob = await res.blob();
         const previousResultFile = new File([blob], "edit_source.png", { type: "image/png" });
-
-        const finalPrompt = `Edit gambar ini: ${editInstruction}. Pertahankan komposisi utama, tapi terapkan perubahan gaya/objek yang diminta dengan kuat. Resolusi tinggi.`;
-
-        const result = await generateCreativeImage(
-            finalPrompt, previousResultFile, settings.aspectRatio, settings.imageSize, null, null
-        );
-        
+        const finalPrompt = `Edit gambar ini: ${editInstruction}. Pertahankan komposisi utama.`;
+        const result = await generateCreativeImage(finalPrompt, previousResultFile, settings.aspectRatio, settings.imageSize, null, null);
         setProgress(100);
-        setLoadingMessage("Menyelesaikan edit...");
+        setLoadingMessage("Selesai edit...");
         await new Promise(resolve => setTimeout(resolve, 600));
-        
         setGeneratedImage(result);
         setBatchResults([]); 
         setEditPrompt('');
-
         saveToResultHistory({ prompt: `Edit: ${editInstruction}`, generatedImage: result });
-
         } catch (err: any) {
         console.error(err);
         setError(err.message || "Gagal mengedit gambar.");
@@ -495,7 +475,7 @@ export const GeneratorModule: React.FC<GeneratorModuleProps> = (props) => {
         onNameChange?: (val: string) => void
     ) => (
         <div className="space-y-2 h-full flex flex-col">
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">
             {label} {required && <span className="text-red-500">*</span>}
         </label>
         <div className="flex-1 flex flex-col gap-2">
@@ -522,14 +502,14 @@ export const GeneratorModule: React.FC<GeneratorModuleProps> = (props) => {
                         <X size={14} />
                     </button>
                     </div>
-                    <span className="text-xs text-primary-600 font-medium">Ganti Gambar</span>
+                    <span className="text-xs text-primary-600 dark:text-primary-400 font-medium">Ganti Gambar</span>
                 </>
                 ) : (
                 <>
                     <div className="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-xl">
                     {required ? '📤' : '➕'}
                     </div>
-                    <span className="text-xs text-gray-500">Unggah</span>
+                    <span className="text-xs text-gray-500 dark:text-gray-400">Unggah</span>
                 </>
                 )}
             </label>
@@ -541,7 +521,7 @@ export const GeneratorModule: React.FC<GeneratorModuleProps> = (props) => {
                 value={nameValue} 
                 onChange={(e) => onNameChange(e.target.value)}
                 placeholder={`Nama ${label.toLowerCase().replace('*', '')}`}
-                className="w-full text-center text-sm border-b border-gray-200 dark:border-gray-700 bg-transparent py-1 focus:border-primary-500 outline-none transition-colors text-gray-800 dark:text-gray-200"
+                className="w-full text-center text-sm border-b border-gray-200 dark:border-gray-700 bg-transparent py-1 focus:border-primary-500 outline-none transition-colors text-gray-800 dark:text-gray-100"
             />
             )}
         </div>
@@ -591,16 +571,11 @@ export const GeneratorModule: React.FC<GeneratorModuleProps> = (props) => {
 
         <div className="space-y-2">
             <h2 className="text-3xl font-bold text-gray-900 dark:text-white">{title}</h2>
-            <p className="text-gray-500 dark:text-gray-400">{description}</p>
+            <p className="text-gray-500 dark:text-gray-300">{description}</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div className="bg-white dark:bg-dark-card p-6 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 space-y-6">
-            
-            {/* 
-                @google/genai-api:fix - Kolom upload utama selalu muncul jika requireImage=true, 
-                tanpa dipengaruhi oleh customGenerateHandler. Ini memastikan kolom Foto Keluarga tidak hilang.
-            */}
             {(!isInfographic && (requireImage || !customGenerateHandler)) && (
                 <div className={`grid gap-4 ${
                 (allowReferenceImage && allowAdditionalFaceImage) 
@@ -617,7 +592,7 @@ export const GeneratorModule: React.FC<GeneratorModuleProps> = (props) => {
 
             <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1">
-                <label className="text-xs font-semibold text-gray-500 uppercase">Rasio Aspek</label>
+                <label className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Rasio Aspek</label>
                 <select 
                     value={settings.aspectRatio} 
                     onChange={(e) => updateSettings({ aspectRatio: e.target.value })}
@@ -631,7 +606,7 @@ export const GeneratorModule: React.FC<GeneratorModuleProps> = (props) => {
                 </select>
                 </div>
                 <div className="space-y-1">
-                <label className="text-xs font-semibold text-gray-500 uppercase">Resolusi</label>
+                <label className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Resolusi</label>
                 <select 
                     value={settings.imageSize} 
                     onChange={(e) => updateSettings({ imageSize: e.target.value })}
@@ -648,7 +623,7 @@ export const GeneratorModule: React.FC<GeneratorModuleProps> = (props) => {
 
             <div className="space-y-3 pt-4 border-t border-gray-100 dark:border-gray-700">
                 <div className="flex justify-between items-end">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                     {customPromptLabel || "Detail Prompt Tambahan"}
                 </label>
                 
@@ -704,8 +679,8 @@ export const GeneratorModule: React.FC<GeneratorModuleProps> = (props) => {
                             <div className={`bg-white w-4 h-4 rounded-full shadow-md transform duration-300 ease-in-out ${settings.isBatchMode ? 'translate-x-4' : ''}`}></div>
                         </div>
                         <div>
-                            <span className="text-sm font-bold text-gray-700 dark:text-gray-200 block">Mode Batch (Banyak Gambar)</span>
-                            <span className="text-[10px] text-gray-500 dark:text-gray-400">Pose akan diacak otomatis untuk tiap gambar.</span>
+                            <span className="text-sm font-bold text-gray-700 dark:text-gray-200 block">Mode Batch</span>
+                            <span className="text-[10px] text-gray-500 dark:text-gray-400">Pose acak otomatis.</span>
                         </div>
                     </div>
                     {settings.isBatchMode && (
@@ -785,7 +760,7 @@ export const GeneratorModule: React.FC<GeneratorModuleProps> = (props) => {
                         </div>
                     ) : (
                         <div className="flex justify-center items-center gap-2">
-                        <span>{settings.isBatchMode ? `Buat ${settings.batchCount} Variasi` : title.toUpperCase().includes('COSPLAY') ? 'GENERATE COSPLAY' : 'Buat Keajaiban'}</span>
+                        <span>{settings.isBatchMode ? `Buat ${settings.batchCount} Variasi` : 'Buat Keajaiban'}</span>
                         <span>✨</span>
                         </div>
                     )}
@@ -801,7 +776,7 @@ export const GeneratorModule: React.FC<GeneratorModuleProps> = (props) => {
                     <div className="flex justify-between items-center mb-4">
                         <h3 className="font-bold text-gray-700 dark:text-gray-200">Hasil Batch ({batchResults.length} Gambar)</h3>
                     </div>
-                    <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-4 auto-rows-max">
+                    <div className="grid grid-cols-2 gap-4 auto-rows-max">
                         {batchResults.map((imgSrc, idx) => (
                             <div key={idx} className="relative group/item rounded-lg overflow-hidden shadow-md cursor-pointer" onClick={() => setViewImage(imgSrc)}>
                             <img src={imgSrc} alt={`Result ${idx}`} className="w-full h-auto object-cover" />
@@ -810,11 +785,6 @@ export const GeneratorModule: React.FC<GeneratorModuleProps> = (props) => {
                             </div>
                             </div>
                         ))}
-                        {loading && batchResults.length < settings.batchCount && (
-                            <div className="flex items-center justify-center bg-gray-200 dark:bg-gray-700 rounded-lg h-40 animate-pulse">
-                            <span className="text-xs text-gray-500">Memproses...</span>
-                            </div>
-                        )}
                     </div>
                 </div>
                 ) : generatedImage ? (
@@ -825,31 +795,13 @@ export const GeneratorModule: React.FC<GeneratorModuleProps> = (props) => {
                     className="w-full h-auto max-h-[500px] object-contain rounded-lg shadow-2xl cursor-pointer"
                     onClick={() => setViewImage(generatedImage)}
                     />
-                    <button 
-                    onClick={() => setViewImage(generatedImage)}
-                    className="absolute top-4 right-4 p-2 bg-black/50 text-white rounded-full opacity-0 group-hover/main:opacity-100 transition-opacity hover:bg-black/70"
-                    >
-                    <ZoomIn size={20} />
-                    </button>
                 </div>
                 ) : (
                 <div className="text-center text-gray-400 dark:text-gray-500 w-full h-full flex items-center justify-center">
-                    {loading ? (
-                    <div className="relative flex flex-col items-center">
-                        <div className="relative w-20 h-20 mb-6">
-                            <div className="absolute inset-0 border-2 border-primary-500/20 rounded-full animate-[spin_3s_linear_infinite]"></div>
-                            <div className="absolute inset-2 border-2 border-t-indigo-500 border-r-transparent border-b-indigo-500 border-l-transparent rounded-full animate-[spin_2s_linear_infinite]"></div>
-                            <div className="absolute inset-5 bg-gradient-to-br from-primary-500/20 to-indigo-500/20 rounded-full animate-pulse backdrop-blur-sm"></div>
-                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-primary-500 text-xs font-mono">AI</div>
-                        </div>
-                        <p className="text-sm font-medium tracking-widest uppercase text-gray-400 dark:text-gray-500 animate-pulse">Memproses</p>
-                    </div>
-                    ) : (
                     <div className="opacity-50">
                         <ImageIcon size={64} className="mx-auto mb-3" />
                         <p>Visual akan muncul di sini</p>
                     </div>
-                    )}
                 </div>
                 )}
             </div>
@@ -857,23 +809,18 @@ export const GeneratorModule: React.FC<GeneratorModuleProps> = (props) => {
             {generatedImage && !loading && !settings.isBatchMode && (
                 <div className="flex flex-col gap-6 animate-fade-in-up">
                 <div className="flex flex-col items-center gap-4">
-                    {renderCustomResultActions && (
-                    <div className="w-full">
-                        {renderCustomResultActions(generatedImage)}
-                    </div>
-                    )}
                     <div className="flex gap-4">
                         <button 
                         onClick={() => setViewImage(generatedImage)}
-                        className="px-6 py-2.5 bg-gray-800 text-white rounded-full font-medium shadow-lg hover:bg-gray-900 transition-all flex items-center gap-2"
+                        className="px-6 py-2.5 bg-gray-800 dark:bg-gray-700 text-white rounded-full font-medium shadow-lg hover:bg-gray-900 transition-all flex items-center gap-2"
                         >
                         <ZoomIn size={18} /> Lihat Full
                         </button>
                         <button 
                         onClick={() => handleDownload(generatedImage, `gege-creation-${Date.now()}.png`)}
-                        className="px-6 py-2.5 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-full font-medium shadow-xl hover:scale-105 transition-transform flex items-center gap-2 border border-gray-200 dark:border-gray-600"
+                        className="px-6 py-2.5 bg-white dark:bg-gray-600 text-gray-900 dark:text-white rounded-full font-medium shadow-xl hover:scale-105 transition-transform flex items-center gap-2 border border-gray-200 dark:border-gray-500"
                         >
-                        <span>Unduh Hasil HD</span>
+                        <span>Unduh HD</span>
                         <Download size={18} />
                         </button>
                     </div>
@@ -902,105 +849,18 @@ export const GeneratorModule: React.FC<GeneratorModuleProps> = (props) => {
                         type="text"
                         value={editPrompt}
                         onChange={(e) => setEditPrompt(e.target.value)}
-                        placeholder="Ketik instruksi edit... (cth: ubah rambut jadi merah)"
+                        placeholder="Ketik instruksi edit..."
                         className="flex-1 rounded-xl border border-gray-300 dark:border-gray-600 bg-transparent p-2.5 text-sm dark:text-white focus:ring-2 focus:ring-primary-500 outline-none"
-                        onKeyDown={(e) => e.key === 'Enter' && handleQuickEdit(editPrompt)}
                     />
                     <button
                         onClick={() => handleQuickEdit(editPrompt)}
                         disabled={!editPrompt.trim()}
                         className="px-4 py-2 bg-gray-800 dark:bg-gray-700 text-white rounded-xl text-sm font-medium hover:bg-gray-900 dark:hover:bg-gray-600 disabled:opacity-50 transition-colors"
                     >
-                        Terapkan
+                        Edit
                     </button>
                     </div>
                 </div>
-
-                <div className="bg-white dark:bg-dark-card p-6 rounded-2xl border border-gray-200 dark:border-gray-700 space-y-6">
-                    <div className="flex items-center gap-2 border-b border-gray-200 dark:border-gray-700 pb-3">
-                        <span className="text-xl">🚀</span>
-                        <h3 className="font-bold text-gray-800 dark:text-gray-200">Studio Konten & Sosial Media</h3>
-                    </div>
-
-                    <div className="space-y-2">
-                        <button 
-                            onClick={handleAnalyzePrompt}
-                            disabled={analysisLoading}
-                            className="text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1"
-                        >
-                            {analysisLoading ? 'Menganalisis...' : '🔍 Analisis Prompt (Reverse Engineering)'}
-                        </button>
-                        {analyzedPrompt && (
-                            <div className="bg-gray-100 dark:bg-gray-800 p-3 rounded-lg text-xs text-gray-700 dark:text-gray-300 font-mono relative group">
-                                {analyzedPrompt}
-                                <button 
-                                    onClick={() => navigator.clipboard.writeText(analyzedPrompt)}
-                                    className="absolute top-2 right-2 p-1 bg-white dark:bg-gray-700 rounded shadow hover:bg-gray-50 opacity-0 group-hover:opacity-100 transition-opacity"
-                                    title="Salin"
-                                >
-                                    📋
-                                </button>
-                            </div>
-                        )}
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                        {['Instagram', 'Threads', 'TikTok'].map(platform => (
-                            <div key={platform} className="space-y-2">
-                                <button
-                                    onClick={() => handleSocialCaption(platform)}
-                                    disabled={analysisLoading}
-                                    className={`w-full py-2 px-3 rounded-lg text-sm font-medium transition-colors border ${
-                                        platform === 'Instagram' ? 'bg-pink-50 text-pink-600 border-pink-200 hover:bg-pink-100 dark:bg-pink-900/20 dark:border-pink-800' :
-                                        platform === 'TikTok' ? 'bg-gray-800 text-white border-gray-700 hover:bg-black' :
-                                        'bg-gray-50 text-gray-800 border-gray-300 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600'
-                                    }`}
-                                >
-                                    Buat {platform}
-                                </button>
-                                {socialCaptions[platform] && (
-                                    <div className="bg-gray-50 dark:bg-gray-800 p-2 rounded border border-gray-200 dark:border-gray-700 h-64 min-h-[250px] overflow-y-auto text-xs whitespace-pre-wrap relative group">
-                                        {socialCaptions[platform]}
-                                        <button 
-                                            onClick={() => navigator.clipboard.writeText(socialCaptions[platform])}
-                                            className="absolute top-2 right-2 p-1 bg-white dark:bg-gray-700 rounded shadow hover:bg-gray-50 opacity-0 group-hover:opacity-100 transition-opacity"
-                                            title="Salin"
-                                        >
-                                            📋
-                                        </button>
-                                    </div>
-                                )}
-                            </div>
-                        ))}
-                    </div>
-                </div>
-                </div>
-            )}
-
-            {resultHistory.filter(h => h.generatedImage).length > 0 && (
-                <div className="bg-white dark:bg-dark-card p-6 rounded-2xl border border-gray-200 dark:border-gray-700 mt-6">
-                    <div className="flex items-center gap-2 mb-4 border-b border-gray-100 dark:border-gray-700 pb-2">
-                    <History className="text-gray-500" size={18} />
-                    <h3 className="font-bold text-gray-800 dark:text-gray-200">Riwayat Sesi Ini</h3>
-                    </div>
-                    <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
-                    {resultHistory.filter(h => h.generatedImage).map((item, idx) => (
-                        <div 
-                            key={idx} 
-                            className="relative group rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 aspect-square cursor-pointer bg-gray-100 dark:bg-gray-800"
-                        >
-                            <img src={item.generatedImage!} alt="History" className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
-                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
-                                <button 
-                                onClick={(e) => { e.stopPropagation(); setViewImage(item.generatedImage); }}
-                                className="p-1.5 bg-white/20 backdrop-blur rounded-full text-white hover:bg-white/40"
-                                >
-                                <ZoomIn size={16} />
-                                </button>
-                            </div>
-                        </div>
-                    ))}
-                    </div>
                 </div>
             )}
             </div>
